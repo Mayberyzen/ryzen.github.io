@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHiSHERMAN - Email Security Tool</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #e11d48;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --gray: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f1f5f9;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        h1, h2, h3 {
+            color: var(--dark);
+            margin-bottom: 1rem;
+        }
+        
+        .tab-container {
+            margin-bottom: 2rem;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--gray);
+            margin-bottom: 1rem;
+        }
+        
+        .tab {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .tab.active {
+            border-bottom: 2px solid var(--primary);
+            color: var(--primary);
+            font-weight: 500;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .feature {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-secondary {
+            background-color: var(--light);
+            color: var(--dark);
+            border: 1px solid var(--gray);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e2e8f0;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 200px;
+            border: 1px solid var(--gray);
+            border-radius: 4px;
+            padding: 1rem;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            resize: vertical;
+        }
+        
+        .result {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .result.safe {
+            background-color: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--success);
+            color: var(--success);
+        }
+        
+        .result.warning {
+            background-color: rgba(245, 158, 11, 0.1);
+            border: 1px solid var(--warning);
+            color: var(--warning);
+        }
+        
+        .result.danger {
+            background-color: rgba(225, 29, 72, 0.1);
+            border: 1px solid var(--secondary);
+            color: var(--secondary);
+        }
+        
+        .indicators {
+            margin-top: 1rem;
+        }
+        
+        .indicator {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .indicator span {
+            margin-left: 0.5rem;
+        }
+        
+        .safe-icon, .warning-icon, .danger-icon {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+        }
+        
+        .safe-icon {
+            background-color: var(--success);
+        }
+        
+        .warning-icon {
+            background-color: var(--warning);
+        }
+        
+        .danger-icon {
+            background-color: var(--secondary);
+        }
+        
+        .examples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .example {
+            border: 1px solid var(--gray);
+            border-radius: 4px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .example:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .quiz-container {
+            margin-top: 1rem;
+        }
+        
+        .quiz-item {
+            margin-bottom: 2rem;
+            border: 1px solid var(--gray);
+            border-radius: 4px;
+            padding: 1rem;
+        }
+        
+        .options {
+            margin-top: 1rem;
+        }
+        
+        .option {
+            display: block;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid var(--gray);
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .option:hover {
+            background-color: #f1f5f9;
+        }
+        
+        .option.selected {
+            border-color: var(--primary);
+            background-color: rgba(37, 99, 235, 0.1);
+        }
+        
+        .progress {
+            height: 8px;
+            background-color: #e2e8f0;
+            border-radius: 4px;
+            margin-bottom: 2rem;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary);
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .info-list {
+            list-style-type: none;
+            margin: 1rem 0;
+        }
+        
+        .info-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .info-list li:last-child {
+            border-bottom: none;
+        }
+        
+        footer {
+            background-color: var(--dark);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .features {
+                grid-template-columns: 1fr;
+            }
+            
+            .examples {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                <path d="M2 17l10 5 10-5"></path>
+                <path d="M2 12l10 5 10-5"></path>
+            </svg>
+            <h1>PHiSHERMAN</h1>
+        </div>
+        <p>Protect yourself from email phishing attempts</p>
+    </header>
+    
+    
+    <div class="container">
+        <div class="tab-container">
+            <div class="tabs">
+                <div class="tab active" data-tab="checker">Email Checker</div>
+                <div class="tab" data-tab="learn">Learn</div>
+                <div class="tab" data-tab="quiz">Test Your Skills</div>
+            </div>
+            
+            <div class="tab-content active" id="checker">
+                <div class="card">
+                    <h2>Check Your Email</h2>
+                    <p>Paste the suspicious email content below to analyze for phishing indicators:</p>
+                    <textarea id="email-content" placeholder="Paste email content here..."></textarea>
+                    <button class="btn" id="analyze-btn">Analyze Email</button>
+                    
+                    <div class="result" id="result">
+                        <h3>Analysis Result:</h3>
+                        <div class="indicators" id="indicators"></div>
+                    </div>
+                    
+                    <h3>Example Emails to Test:</h3>
+                    <div class="examples">
+                        <div class="example" data-example="phishing">
+                            <h4>Phishing Example</h4>
+                            <p>Account Security Alert - Immediate Action Required</p>
+                        </div>
+                        <div class="example" data-example="legitimate">
+                            <h4>Legitimate Example</h4>
+                            <p>Your Monthly Account Statement</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="learn">
+                <div class="card">
+                    <h2>How to Identify Phishing Emails</h2>
+                    <p>Phishing emails are fraudulent messages designed to trick you into revealing sensitive information or installing malware. Here are key indicators to watch for:</p>
+                    
+                    <ul class="info-list">
+                        <li><strong> Urgency and Pressure:</strong> Messages that create a sense of urgency or fear to push you into taking immediate action.</li>
+                        <li><strong> Suspicious Sender:</strong> Email addresses that mimic legitimate companies but contain slight misspellings or unusual domains.</li>
+                        <li><strong> Generic Greetings:</strong> Using "Dear Customer" instead of your name.</li>
+                        <li><strong> Poor Grammar:</strong> Spelling errors, awkward phrasing, or grammatical mistakes.</li>
+                        <li><strong> Suspicious Links:</strong> Hovering over links shows a different URL than what is displayed.</li>
+                        <li><strong> Requests for Personal Information:</strong> Legitimate organizations rarely request sensitive information via email.</li>
+                        <li><strong> Unexpected Attachments:</strong> Files you weren't expecting, especially executable files.</li>
+                    </ul>
+                    
+                    <h3>Comparison: Legitimate vs Phishing</h3>
+                    <div class="examples">
+                        <div class="example">
+                            <h4>Legitimate Email Features</h4>
+                            <ul>
+                                <li> Addresses you by your proper name</li>
+                                <li> Clean, professional design</li>
+                                <li> Correct grammar and spelling</li>
+                                <li> Links match hovering URL</li>
+                                <li> No pressure tactics</li>
+                            </ul>
+                        </div>
+                        <div class="example">
+                            <h4>Phishing Email Features</h4>
+                            <ul>
+                                <li> Generic greeting</li>
+                                <li> Poor design or formatting</li>
+                                <li> Spelling and grammar errors</li>
+                                <li> Mismatched URLs</li>
+                                <li> Creates urgency or fear</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="quiz">
+                <div class="card">
+                    <h2>Test Your Phishing Detection Skills</h2>
+                    <p>Can you identify which of these emails are phishing attempts?</p>
+                    
+                    <div class="progress">
+                        <div class="progress-bar" id="progress-bar"></div>
+                    </div>
+                    
+                    <div class="quiz-container" id="quiz-container">
+                        <!-- Quiz content will be added dynamically -->
+                    </div>
+                    
+                    <div id="quiz-result" style="display: none;">
+                        <h3>Quiz Results</h3>
+                        <p id="quiz-score"></p>
+                        <button class="btn" id="retry-quiz">Try Again</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">🔍</div>
+                <h3>Email Analysis</h3>
+                <p>Scan email content for common phishing indicators using our advanced detection algorithms.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📚</div>
+                <h3>Educational Resources</h3>
+                <p>Learn to identify and protect yourself from various types of phishing attempts.</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🏆</div>
+                <h3>Skills Testing</h3>
+                <p>Test your ability to spot phishing emails with our interactive quizzes.</p>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>&copy; 2025 PHiSHERMAN - Protecting Your Digital Identity</p>
+        <p>A tool to safeguard you from phishing email scams.</p>
+        <div class="footer-links" style="display: flex; justify-content: center; align-items: center; gap: 1rem; margin-top: 1rem;">
+            <a href="https://www.linkedin.com/in/chetan-mahapatra-0113aa183" target="_blank" style="display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: white;">
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linkedin/linkedin-original.svg" width="24" alt="LinkedIn">
+                <span>Ryzen</span>
+            </a>
+            <a href="https://github.com/Mayberyzen" target="_blank" style="display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: white;">
+                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" width="24" alt="GitHub">
+                <span>Ryzen</span>
+            </a>
+        </div>
+    </footer>
+    
+    <script>
+        // Tab functionality
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+        
+        // Example emails
+        const exampleEmails = {
+            phishing: `Subject: URGENT: Your Account Has Been Compromised
+            
+From: security-alert@amaz0n-security.com
+
+Dear Valued Customer,
+
+We have detected suspicious activity on your account. Your account will be suspended in 24 hours unless you verify your information immediately by clicking the link below:
+
+[Verify Account Now]
+
+If you fail to verify your account, you will lose access to all services.
+
+Regards,
+Amazon Security Team`,
+            
+            legitimate: `Subject: Your Monthly Account Statement
+            
+From: statements@amazon.com
+
+Hello John,
+
+Your monthly account statement for February 2025 is now available. You can view your statement by logging into your account at amazon.com and navigating to Your Account > Your Orders.
+
+Thank you for being an Amazon customer!
+
+Best regards,
+Amazon Customer Service Team
+
+Note: This is an automated message. Please do not reply to this email.`
+        };
+        
+        document.querySelectorAll('.example').forEach(example => {
+            example.addEventListener('click', () => {
+                const type = example.dataset.example;
+                if (type && exampleEmails[type]) {
+                    document.getElementById('email-content').value = exampleEmails[type];
+                }
+            });
+        });
+        
+        // Email analysis functionality
+        document.getElementById('analyze-btn').addEventListener('click', () => {
+            const emailContent = document.getElementById('email-content').value;
+            if (!emailContent.trim()) {
+                alert('Please paste an email to analyze.');
+                return;
+            }
+            
+            analyzeEmail(emailContent);
+        });
+        
+        function analyzeEmail(content) {
+            // Simple analysis logic - in a real app, this would be more sophisticated
+            const indicators = [];
+            let riskLevel = 'safe';
+            
+            // Check for suspicious domain in from field
+            if (content.toLowerCase().includes('from:')) {
+                const fromLine = content.toLowerCase().split('from:')[1].split('\n')[0];
+                if (fromLine.includes('@') && 
+                    (fromLine.includes('0') || 
+                     fromLine.includes('-security') || 
+                     !fromLine.includes('.com'))) {
+                    indicators.push({level: 'danger', text: 'Suspicious sender domain detected'});
+                    riskLevel = 'danger';
+                }
+            }
+            
+            // Check for urgency language
+            if (content.toLowerCase().includes('urgent') || 
+                content.toLowerCase().includes('immediately') || 
+                content.toLowerCase().includes('suspended') || 
+                content.toLowerCase().includes('compromise')) {
+                indicators.push({level: 'warning', text: 'Urgent language detected - phishers often create false urgency'});
+                if (riskLevel === 'safe') riskLevel = 'warning';
+            }
+            
+            // Check for requests to verify information
+            if (content.toLowerCase().includes('verify your') || 
+                content.toLowerCase().includes('confirm your')) {
+                indicators.push({level: 'warning', text: 'Requests to verify personal information'});
+                if (riskLevel === 'safe') riskLevel = 'warning';
+            }
+            
+            // Check for suspicious links
+            if (content.includes('[') && content.includes(']')) {
+                indicators.push({level: 'danger', text: 'Potentially suspicious link formatting'});
+                riskLevel = 'danger';
+            }
+            
+            // Check for generic greeting
+            if (content.toLowerCase().includes('dear customer') || 
+                content.toLowerCase().includes('dear user') || 
+                content.toLowerCase().includes('valued customer')) {
+                indicators.push({level: 'warning', text: 'Generic greeting - legitimate organizations usually use your name'});
+                if (riskLevel === 'safe') riskLevel = 'warning';
+            }
+            
+            // If nothing suspicious was found
+            if (indicators.length === 0) {
+                indicators.push({level: 'safe', text: 'No obvious phishing indicators detected'});
+            }
+            
+            // Display results
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = 'result ' + riskLevel;
+            resultDiv.style.display = 'block';
+            
+            const indicatorsDiv = document.getElementById('indicators');
+            indicatorsDiv.innerHTML = '';
+            
+            indicators.forEach(indicator => {
+                const div = document.createElement('div');
+                div.className = 'indicator';
+                div.innerHTML = `
+                    <div class="${indicator.level}-icon"></div>
+                    <span>${indicator.text}</span>
+                `;
+                indicatorsDiv.appendChild(div);
+            });
+        }
+        
+        // Quiz functionality
+        const quizData = [
+            {
+                email: `Subject: Password Reset Required
+From: security@paypa1.com
+                
+Dear Customer,
+                
+Our system has detected unusual login attempts on your account. To secure your account, please reset your password immediately by clicking the link below:
+                
+[Reset Password Now]
+                
+If you do not take action within 24 hours, your account will be temporarily suspended.
+                
+PayPal Security Team`,
+                question: "Is this a legitimate or phishing email?",
+                options: ["Legitimate", "Phishing"],
+                answer: 1,
+                explanation: "This is a phishing email. Note the sender domain 'paypa1.com' (using the number '1' instead of the letter 'l'), the urgent language, and the threat of account suspension."
+            },
+            {
+                email: `Subject: Your Netflix Subscription
+From: info@netflix.com
+                
+Hi John,
+                
+We're confirming that your Netflix subscription plan has been updated as requested. Your next billing date is April 10, 2025.
+                
+If you have any questions about your account, please visit netflix.com/help or contact customer service.
+                
+Thanks for being a Netflix member!
+                
+The Netflix Team`,
+                question: "Is this a legitimate or phishing email?",
+                options: ["Legitimate", "Phishing"],
+                answer: 0,
+                explanation: "This appears to be a legitimate email. It uses a correct domain (netflix.com), addresses the recipient by name, doesn't create false urgency, and directs questions to the official website rather than providing suspicious links."
+            },
+            {
+                email: `Subject: Important: Your iCloud Storage is Full
+From: no-reply@apple-support.org
+                
+Dear Apple User,
+                
+Your iCloud storage is full and your account has been locked. To unlock your account and prevent data loss, please confirm your payment information:
+                
+[Confirm Payment Details]
+                
+All data will be permanently deleted in 48 hours if no action is taken.
+                
+Apple Support Team`,
+                question: "Is this a legitimate or phishing email?",
+                options: ["Legitimate", "Phishing"],
+                answer: 1,
+                explanation: "This is a phishing email. The sender domain 'apple-support.org' is not an official Apple domain. It creates false urgency with threats of data loss and account locking, and asks for payment information via a suspicious link."
+            }
+        ];
+        
+        let currentQuiz = 0;
+        let score = 0;
+        
+        function loadQuiz() {
+            const quizContainer = document.getElementById('quiz-container');
+            if (currentQuiz >= quizData.length) {
+                // Quiz finished
+                document.getElementById('quiz-result').style.display = 'block';
+                document.getElementById('quiz-score').textContent = `You scored ${score} out of ${quizData.length}!`;
+                quizContainer.innerHTML = '';
+                return;
+            }
+            
+            const quizItem = quizData[currentQuiz];
+            
+            quizContainer.innerHTML = `
+                <div class="quiz-item">
+                    <pre>${quizItem.email}</pre>
+                    <p class="question">${quizItem.question}</p>
+                    <div class="options">
+                        ${quizItem.options.map((option, index) => 
+                            `<div class="option" data-index="${index}">${option}</div>`
+                        ).join('')}
+                    </div>
+                    <div class="explanation" style="display: none; margin-top: 1rem; padding: 1rem; background-color: #f1f5f9; border-radius: 4px;">
+                        <strong>Explanation:</strong> ${quizItem.explanation}
+                    </div>
+                </div>
+            `;
+            
+            // Update progress bar
+            document.getElementById('progress-bar').style.width = `${(currentQuiz / quizData.length) * 100}%`;
+            
+            // Add event listeners to options
+            document.querySelectorAll('.option').forEach(option => {
+                option.addEventListener('click', () => {
+                    const selectedIndex = parseInt(option.dataset.index);
+                    
+                    // Highlight selected option
+                    document.querySelectorAll('.option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    option.classList.add('selected');
+                    
+                    // Check answer
+                    if (selectedIndex === quizItem.answer) {
+                        score++;
+                    }
+                    
+                    // Show explanation
+                    document.querySelector('.explanation').style.display = 'block';
+                    
+                    // Move to next question after delay
+                    setTimeout(() => {
+                        currentQuiz++;
+                        loadQuiz();
+                    }, 3000);
+                });
+            });
+        }
+        
+        // Start quiz
+        loadQuiz();
+        
+        // Retry quiz button
+        document.getElementById('retry-quiz').addEventListener('click', () => {
+            currentQuiz = 0;
+            score = 0;
+            document.getElementById('quiz-result').style.display = 'none';
+            loadQuiz();
+        });
+    </script>
+</body>
+</html>

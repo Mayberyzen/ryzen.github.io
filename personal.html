@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Portfolio of Chetan Mahapatra (Ryzen), Cybersecurity Specialist in Penetration Testing and Red Teaming.">
+  <title>Ryzen - CRT Terminal Portfolio</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    :root {
+      --bg-color: #0a0a0a;
+      --text-color: #00ff00;
+      --accent-color: #ffbf00;
+      --error-color: #ff4040;
+      --shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'VT323', monospace;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--bg-color);
+      color: var(--text-color);
+      line-height: 1.5;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* CRT Scan Lines */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent,
+        transparent 2px,
+        rgba(0, 255, 0, 0.05) 2px,
+        rgba(0, 255, 0, 0.05) 4px
+      );
+      z-index: 999;
+      pointer-events: none;
+      animation: flicker 0.2s infinite;
+    }
+
+    @keyframes flicker {
+      0%, 100% { opacity: 0.9; }
+      50% { opacity: 0.7; }
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* Header */
+    header {
+      position: sticky;
+      top: 0;
+      background: var(--bg-color);
+      z-index: 1000;
+      padding: 1rem 0;
+      border-bottom: 2px solid var(--text-color);
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 2rem;
+      color: var(--accent-color);
+      text-shadow: var(--shadow);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .nav-links a {
+      color: var(--text-color);
+      text-decoration: none;
+      font-size: 1.5rem;
+      padding: 0.5rem;
+      position: relative;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: var(--accent-color);
+      animation: glitch 0.2s;
+    }
+
+    .nav-links a::after {
+      content: '_';
+      position: absolute;
+      right: -10px;
+      animation: blink 0.5s infinite;
+    }
+
+    @keyframes glitch {
+      0% { transform: translate(0); }
+      50% { transform: translate(1px, -1px); }
+      100% { transform: translate(0); }
+    }
+
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
+
+    .menu-btn {
+      display: none;
+      font-size: 1.8rem;
+      color: var(--text-color);
+      cursor: pointer;
+      background: none;
+      border: none;
+    }
+
+    /* Sections */
+    .section {
+      padding: 5rem 0;
+      position: relative;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .section-title {
+      font-size: 2.5rem;
+      color: var(--accent-color);
+      text-align: center;
+      margin-bottom: 2rem;
+      text-shadow: var(--shadow);
+      position: relative;
+    }
+
+    .section-title::before,
+    .section-title::after {
+      content: '=====[ ';
+      color: var(--text-color);
+    }
+
+    .section-title::after {
+      content: ' ]=====';
+    }
+
+    /* Hero */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .hero .ascii-art {
+      font-size: clamp(0.5rem, 2vw, 0.8rem);
+      color: var(--text-color);
+      white-space: pre;
+      margin-bottom: 2rem;
+      animation: flicker 0.2s infinite;
+      max-width: 90%;
+    }
+
+    .hero h1 {
+      font-size: 4rem;
+      color: var(--text-color);
+      text-shadow: var(--shadow);
+      margin-bottom: 1rem;
+      animation: type 2s steps(20) forwards;
+      white-space: nowrap;
+      overflow: hidden;
+      border-right: 4px solid var(--text-color);
+    }
+
+    .hero p {
+      font-size: 1.8rem;
+      color: var(--text-color);
+      max-width: 600px;
+      margin: 0 auto 2rem;
+      animation: type 1.5s steps(30) 2s forwards;
+      white-space: nowrap;
+      overflow: hidden;
+      border-right: 4px solid var(--text-color);
+    }
+
+    @keyframes type {
+      from { width: 0; }
+      to { width: 100%; }
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 0.8rem 1.5rem;
+      background: none;
+      border: 2px solid var(--text-color);
+      color: var(--text-color);
+      text-decoration: none;
+      font-size: 1.2rem;
+      text-shadow: var(--shadow);
+      transition: color 0.3s, border-color 0.3s;
+    }
+
+    .btn:hover {
+      color: var(--accent-color);
+      border-color: var(--accent-color);
+      animation: glitch 0.2s;
+    }
+
+    /* Projects */
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+
+    .card {
+      background: none;
+      border: 2px solid var(--text-color);
+      padding: 1.5rem;
+      position: relative;
+      text-align: left;
+      font-size: 1.2rem;
+      transition: border-color 0.3s;
+    }
+
+    .card:hover {
+      border-color: var(--accent-color);
+      animation: glitch 0.2s;
+    }
+
+    .card::before {
+      content: '[ File ]';
+      position: absolute;
+      top: -1rem;
+      left: 1rem;
+      background: var(--bg-color);
+      color: var(--text-color);
+      font-size: 1rem;
+      padding: 0 0.5rem;
+    }
+
+    .card i {
+      font-size: 2rem;
+      color: var(--text-color);
+      margin-bottom: 1rem;
+    }
+
+    .card h3 {
+      font-size: 1.8rem;
+      color: var(--accent-color);
+      margin-bottom: 1rem;
+    }
+
+    .card p {
+      font-size: 1.1rem;
+      color: var(--text-color);
+      margin-bottom: 1.5rem;
+    }
+
+    /* Skills */
+    .skills-terminal {
+      max-width: 900px;
+      margin: 2rem auto;
+      border: 2px solid var(--text-color);
+      padding: 2rem;
+      position: relative;
+      background: none;
+    }
+
+    .skills-terminal::before {
+      content: '[ Diagnostic Report | 7 Processes Running ]';
+      position: absolute;
+      top: -1rem;
+      left: 1rem;
+      background: var(--bg-color);
+      color: var(--text-color);
+      font-size: 1rem;
+      padding: 0 0.5rem;
+    }
+
+    .skill-command {
+      margin-bottom: 1.5rem;
+    }
+
+    .skill-command input {
+      width: 100%;
+      padding: 0.5rem;
+      background: none;
+      border: 1px solid var(--text-color);
+      color: var(--text-color);
+      font-family: 'VT323', monospace;
+      font-size: 1.2rem;
+    }
+
+    .skill-command input:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      box-shadow: var(--shadow);
+    }
+
+    .skill-filter {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .skill-filter button {
+      background: none;
+      border: 2px solid var(--text-color);
+      color: var(--text-color);
+      padding: 0.5rem 1rem;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: color 0.3s, border-color 0.3s;
+    }
+
+    .skill-filter button.active,
+    .skill-filter button:hover {
+      color: var(--accent-color);
+      border-color: var(--accent-color);
+    }
+
+    .skill-item {
+      margin-bottom: 1.5rem;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .skill-item:hover .skill-tooltip {
+      display: block;
+    }
+
+    .skill-item h3 {
+      font-size: 1.5rem;
+      color: var(--accent-color);
+      margin-bottom: 0.5rem;
+    }
+
+    .skill-progress {
+      font-size: 1.2rem;
+      color: var(--text-color);
+      white-space: pre;
+      display: none;
+    }
+
+    .skill-progress.active {
+      display: block;
+    }
+
+    .skill-tooltip {
+      display: none;
+      position: absolute;
+      top: -100%;
+      left: 0;
+      background: var(--bg-color);
+      border: 2px solid var(--text-color);
+      padding: 0.5rem;
+      font-size: 1rem;
+      color: var(--text-color);
+      z-index: 10;
+      max-width: 300px;
+    }
+
+    .skill-tooltip::before {
+      content: '[ Preview ]';
+      position: absolute;
+      top: -1rem;
+      left: 1rem;
+      background: var(--bg-color);
+      color: var(--text-color);
+      font-size: 0.8rem;
+    }
+
+    .skill-error {
+      color: var(--error-color);
+      font-size: 1rem;
+      margin-top: 1rem;
+      cursor: pointer;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--bg-color);
+      border: 2px solid var(--text-color);
+      padding: 2rem;
+      width: 90%;
+      max-width: 500px;
+      z-index: 1000;
+      text-align: left;
+      
+    }
+
+    .modal.active {
+      display: block;
+    }
+
+    .modal::before {
+      content: '[ Output ]';
+      position: absolute;
+      top: -1rem;
+      left: 1rem;
+      background: var(--bg-color);
+      color: var(--text-color);
+      font-size: 1rem;
+      padding: 0 0.5rem;
+    }
+
+    .modal-content {
+      font-size: 1.2rem;
+      color: var(--text-color);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: 2px solid var(--text-color);
+      color: var(--text-color);
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 0.2rem 0.5rem;
+    }
+
+    .modal-close:hover {
+      color: var(--accent-color);
+      border-color: var(--accent-color);
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 999;
+    }
+
+    .modal-overlay.active {
+      display: block;
+    }
+
+    /* Contact */
+    .contact-form {
+      max-width: 600px;
+      margin: 2rem auto;
+      border: 2px solid var(--text-color);
+      padding: 1.5rem;
+      position: relative;
+    }
+
+    .contact-form::before {
+      content: '[ Packet Sender ]';
+      position: absolute;
+      top: -1rem;
+      left: 1rem;
+      background: var(--bg-color);
+      color: var(--text-color);
+      font-size: 1rem;
+      padding: 0 0.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 1.2rem;
+      color: var(--text-color);
+      margin-bottom: 0.5rem;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 0.5rem;
+      background: none;
+      border: 1px solid var(--text-color);
+      color: var(--text-color);
+      font-family: 'VT323', monospace;
+      font-size: 1.2rem;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      box-shadow: var(--shadow);
+    }
+
+    .form-submit {
+      display: block;
+      margin: 0 auto;
+      padding: 0.8rem 1.5rem;
+      background: none;
+      border: 2px solid var(--text-color);
+      color: var(--text-color);
+      font-family: 'VT323', monospace;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: color 0.3s, border-color 0.3s;
+    }
+
+    .form-submit:hover {
+      color: var(--accent-color);
+      border-color: var(--accent-color);
+      animation: glitch 0.2s;
+    }
+
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .social-links a {
+      font-size: 2rem;
+      color: var(--text-color);
+      transition: color 0.3s;
+    }
+
+    .social-links a:hover {
+      color: var(--accent-color);
+      animation: glitch 0.2s;
+    }
+
+    /* Scroll to Top */
+    .scroll-top {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      background: none;
+      border: 2px solid var(--text-color);
+      color: var(--text-color);
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      cursor: pointer;
+      transition: all 0.3s;
+      z-index: 999;
+    }
+
+    .scroll-top.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .scroll-top:hover {
+      border-color: var(--accent-color);
+      color: var(--accent-color);
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 2rem 0;
+      border-top: 2px solid var(--text-color);
+      color: var(--text-color);
+      font-size: 1.2rem;
+    }
+
+    .hack-alert {
+      margin-bottom: 1rem;
+      color: var(--error-color);
+    }
+
+    .system-time {
+      margin-bottom: 1rem;
+      color: var(--accent-color);
+    }
+
+    /* Accessibility Mode */
+    body.accessibility-mode {
+      animation: none !important;
+    }
+
+    body.accessibility-mode .section,
+    body.accessibility-mode .hero h1,
+    body.accessibility-mode .hero p,
+    body.accessibility-mode .card,
+    body.accessibility-mode .nav-links a,
+    body.accessibility-mode .skill-progress,
+    body.accessibility-mode .modal,
+    body.accessibility-mode .ascii-art {
+      animation: none !important;
+      border-right: none !important;
+      white-space: normal !important;
+      overflow: visible !important;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .menu-btn {
+        display: block;
+      }
+
+      .nav-links {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        height: 100vh;
+        width: 70%;
+        background: var(--bg-color);
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transition: right 0.3s ease;
+        border-left: 2px solid var(--text-color);
+      }
+
+      .nav-links.active {
+        right: 0;
+      }
+
+      .nav-links a {
+        font-size: 2rem;
+        margin: 1rem 0;
+      }
+
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+
+      .hero p {
+        font-size: 1.3rem;
+      }
+
+      .section-title {
+        font-size: 2rem;
+      }
+
+      .skills-terminal {
+        padding: 1.5rem;
+      }
+
+      .modal {
+        max-width: 95%;
+        padding: 1.5rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .grid-container {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        padding: 1rem;
+      }
+
+      .skill-tooltip {
+        top: -150%;
+        max-width: 80%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Accessibility Toggle -->
+  <button class="accessibility-toggle" id="accessibilityToggle" aria-label="Toggle accessibility mode" style="position: fixed; top: 20px; right: 20px; background: none; border: 2px solid var(--text-color); color: var(--text-color); padding: 0.5rem; font-size: 1.2rem;">
+    <i class="fas fa-universal-access"></i>
+  </button>
+
+  <!-- Scroll to Top -->
+  <div class="scroll-top" id="scrollTop" role="button" aria-label="Scroll to top">
+    <i class="fas fa-arrow-up"></i>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="modalOverlay"></div>
+  <div class="modal" id="skillModal">
+    <h2 id="modalTitle" style="display: none;">Skill Details</h2>
+    <button class="modal-close" aria-label="Close modal">[X]</button>
+    <div class="modal-content" id="modalContent"></div>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="container">
+      <nav>
+        <div class="logo">
+          <i class="fas fa-terminal"></i> RZN.sec
+        </div>
+        <button class="menu-btn" id="menuBtn" aria-label="Toggle menu">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="nav-links" id="navLinks">
+          <a href="#hero" class="active">> Home</a>
+          <a href="#projects">> Projects</a>
+          <a href="#skills">> Skills</a>
+          <a href="#about">> About</a>
+          <a href="#contact">> Contact</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section id="hero" class="hero section">
+    <div class="container">
+      <pre class="ascii-art">
+  
+
+    
+ .----------------.  .----------------.  .-----------------. .----------------.  .----------------.  .----------------.  .----------------. 
+ | .--------------. || .--------------. || .--------------. || .--------------. || .--------------. || .--------------. || .--------------. |
+ | |  _______     | || |   ________   | || | ____  _____  | || |              | || |    _______   | || |  _________   | || |     ______   | |
+ | | |_   __ \    | || |  |  __   _|  | || ||_   \|_   _| | || |              | || |   /  ___  |  | || | |_   ___  |  | || |   .' ___  |  | |
+ | |   | |__) |   | || |  |_/  / /    | || |  |   \ | |   | || |              | || |  |  (__ \_|  | || |   | |_  \_|  | || |  / .'   \_|  | |
+ | |   |  __ /    | || |     .'.' _   | || |  | |\ \| |   | || |              | || |   '.___`-.   | || |   |  _|  _   | || |  | |         | |
+ | |  _| |  \ \_  | || |   _/ /__/ |  | || | _| |_\   |_  | || |      _       | || |  |`\____) |  | || |  _| |___/ |  | || |  \ `.___.'\  | |
+ | | |____| |___| | || |  |________|  | || ||_____|\____| | || |     (_)      | || |  |_______.'  | || | |_________|  | || |   `._____.'  | |
+ | |              | || |              | || |              | || |              | || |              | || |              | || |              | |
+ | '--------------' || '--------------' || '--------------' || '--------------' || '--------------' || '--------------' || '--------------' |
+  '----------------'  '----------------'  '----------------'  '----------------'  '----------------'  '----------------'  '----------------' 
+ 
+      </pre>
+      <h1>USER: Ryzen</h1>
+      <p>ROLE: Cybersecurity Specialist | Penetration Testing | Red Teaming</p>
+      <a href="#projects" class="btn">EXECUTE: Projects</a>
+    </div>
+  </section>
+
+  <!-- Projects -->
+  <section id="projects" class="section">
+    <div class="container">
+      <h2 class="section-title">Projects</h2>
+      <div class="grid-container">
+        <div class="card">
+          <i class="fas fa-virus"></i>
+          <h3>Z3nHawk</h3>
+          <p>Automated pentesting framework with reconnaissance, scanning, and exploit mapping.</p>
+          <a href="https://github.com/Mayberyzen/Z3NHAWK" target="_blank" class="btn">cat z3nhawk.txt</a>
+        </div>
+        <div class="card">
+          <i class="fas fa-fish"></i>
+          <h3>Phisherman</h3>
+          <p>A web based project to detect anykind of phising mails aalong side teaching and fun games to understand phising .</p>
+          <a href="phishing-alerter.html" class="btn">cat phisherman.txt</a>
+        </div>
+        <div class="card">
+          <i class="fas fa-search"></i>
+          <h3>Ph1sherman extension</h3>
+          <p>A web hook/extenson used to generate alert for phsing sites and safe sites whem you visit a new unknown/known site .</p>
+          <a href="https://github.com/Mayberyzen/Ph1sherman" class="btn">cat vulnscan.txt</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Skills -->
+  <section id="skills" class="section">
+    <div class="container">
+      <h2 class="section-title">System Skills</h2>
+      <div class="skills-terminal">
+        <div class="skill-command">
+          <input type="text" id="skillSearch" placeholder="> Enter command (e.g., list skills, find tools)" aria-label="Search skills">
+        </div>
+        <div class="skill-filter">
+          <button data-filter="all" class="active">All</button>
+          <button data-filter="cybersecurity">Cybersecurity</button>
+          <button data-filter="languages">Languages</button>
+        </div>
+        <div class="skill-item" data-details="[OUTPUT] Web app testing, SQL injection, XSS, Burp Suite mastery." data-category="cybersecurity">
+          <h3>Penetration Testing</h3>
+          <div class="skill-progress active">[ -=========] 90%</div>
+          <div class="skill-tooltip">Quick scan: Web apps, Burp Suite</div>
+        </div>
+        <div class="skill-item" data-details="[OUTPUT] C2 frameworks, lateral movement, social engineering." data-category="cybersecurity">
+          <h3>Red Teaming</h3>
+          <div class="skill-progress active">[ -======== ] 85%</div>
+          <div class="skill-tooltip">Quick scan: C2, social engineering</div>
+        </div>
+        <div class="skill-item" data-details="[OUTPUT] Buffer overflows, privilege escalation, Metasploit." data-category="cybersecurity">
+          <h3>Exploitation</h3>
+          <div class="skill-progress active">[ -=======  ] 80%</div>
+          <div class="skill-tooltip">Quick scan: Metasploit, overflows</div>
+        </div>
+        <div class="skill-item" data-details="[OUTPUT] Packet analysis, firewall configs, Nessus scans." data-category="cybersecurity">
+          <h3>Network Security</h3>
+          <div class="skill-progress active">[ -======== ] 85%</div>
+          <div class="skill-tooltip">Quick scan: Nessus, packet analysis</div>
+        </div>
+        <div class="skill-item" data-details="[OUTPUT] Custom scripts in Python, Bash for recon and exploits." data-category="cybersecurity">
+          <h3>Automation</h3>
+          <div class="skill-progress active">[ -======   ] 75%</div>
+          <div class="skill-tooltip">Quick scan: Python, Bash scripts</div>
+        </div>
+        <div class="skill-item" data-details="[OUTPUT] Burp Suite, Metasploit, Splunk, ELK Stack, Nessus." data-category="cybersecurity">
+          <h3>Tools</h3>
+          <div class="skill-progress active">[ -=========] 90%</div>
+          <div class="skill-tooltip">Quick scan: Splunk, ELK Stack</div>
+        </div>
+        <div class="skill-item" data-details="[OUTPUT] C++ (low-level exploits),Javascript(begineer),Python (scripting), Bash (automation)." data-category="languages">
+          <h3>Languages</h3>
+          <div class="skill-progress active">[ -=======  ] 80%</div>
+          <div class="skill-tooltip">Quick scan: C++, Python, Bash</div>
+        </div>
+        <div class="skill-error" id="errorLog">[ERR] Click to view system logs</div>
+        <a href="#" id="downloadSkills" class="btn" style="margin-top: 1rem; display: block; text-align: center;">download ryzen_skills.txt</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section id="about" class="section">
+    <div class="container">
+      <h2 class="section-title">About User</h2>
+      <p style="max-width: 800px; margin: 0 auto;">
+        [ID] Chetan Mahapatra<br>
+
+        [ROLE] Cybersecurity specialist<br>
+
+        [EDU] Pursuing MCA in Cybersecurity & Digital Defence, Sri Sri University<br>
+
+        [FOCUS] Red Teaming, penetration testing, building security tools, researching threats, hunting bugs<br>
+
+        [MISSION] Break systems to make them stronger
+      </p>
+    </div>
+  </section>
+  <section id="contact" class="section">
+    <div class="container">
+      <h2 class="section-title">Transmit Packet</h2>
+      <form class="contact-form">
+        <div class="form-group">
+          <label for="name">[SOURCE] Name</label>
+          <input type="text" id="name" class="form-input" required aria-label="Your name">
+        </div>
+        <div class="form-group">
+          <label for="email">[DEST] Email</label>
+          <input type="email" id="email" class="form-input" required aria-label="Your email">
+        </div>
+        <div class="form-group">
+          <label for="message">[DATA] Message</label>
+          <textarea id="message" class="form-input" rows="5" required aria-label="Your message"></textarea>
+        </div>
+        <button type="submit" class="form-submit">send_packet</button>
+      </form>
+      <div class="social-links">
+        <a href="https://www.linkedin.com/in/chetan-mahapatra-0113aa183/" target="_blank" aria-label="LinkedIn">
+          <i class="fab fa-linkedin"></i>
+        </a>
+        <a href="https://github.com/Mayberyzen" target="_blank" aria-label="GitHub">
+          <i class="fab fa-github"></i>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p class="system-time" id="systemTime">[TIME] Loading...</p>
+      <p class="hack-alert" id="hackAlert">[ALERT] System secure</p>
+      <p>[END] Session terminated</p>
+    </div>
+  </footer>
+
+  <script>
+    // Accessibility Toggle
+    document.getElementById('accessibilityToggle').addEventListener('click', () => {
+      document.body.classList.toggle('accessibility-mode');
+    });
+
+    // Mobile Menu
+    const menuBtn = document.getElementById('menuBtn');
+    const navLinks = document.getElementById('navLinks');
+    menuBtn.addEventListener('click', () => {
+      navLinks.classList.toggle('active');
+      menuBtn.querySelector('i').classList.toggle('fa-bars');
+      menuBtn.querySelector('i').classList.toggle('fa-times');
+    });
+
+    // Scroll-to-Top
+    const scrollTopBtn = document.getElementById('scrollTop');
+    window.addEventListener('scroll', () => {
+      scrollTopBtn.classList.toggle('visible', window.scrollY > 500);
+    });
+    scrollTopBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Section Animations
+    const sections = document.querySelectorAll('.section');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          if (entry.target.id === 'skills') {
+            const skillProgress = document.querySelectorAll('.skill-progress');
+            skillProgress.forEach((bar, index) => {
+              setTimeout(() => {
+                bar.classList.add('active');
+              }, index * 200);
+            });
+          }
+        }
+      });
+    }, { threshold: 0.3 });
+    sections.forEach(section => observer.observe(section));
+
+    // Skills Modal
+    const skillItems = document.querySelectorAll('.skill-item');
+    const modal = document.getElementById('skillModal');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const modalContent = document.getElementById('modalContent');
+    const modalClose = document.querySelector('.modal-close');
+
+    function openModal(details) {
+      modalContent.textContent = details;
+      modal.classList.add('active');
+      modalOverlay.classList.add('active');
+      modalClose.focus();
+    }
+
+    function closeModal() {
+      modal.classList.remove('active');
+      modalOverlay.classList.remove('active');
+    }
+
+    skillItems.forEach(item => {
+      item.addEventListener('click', () => {
+        const details = item.getAttribute('data-details');
+        openModal(details);
+      });
+    });
+
+    modalClose.addEventListener('click', closeModal);
+    modalOverlay.addEventListener('click', closeModal);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.classList.contains('active')) {
+        closeModal();
+      }
+    });
+
+    // Skill Search
+    const skillSearch = document.getElementById('skillSearch');
+    skillSearch.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const command = skillSearch.value.toLowerCase().trim();
+        skillItems.forEach(item => {
+          item.style.display = 'block';
+          item.style.borderColor = 'var(--text-color)';
+        });
+
+        if (command === 'list skills' || command === 'show all') {
+          alert('[RESPONSE] Displaying all skills...');
+        } else if (command.includes('find') || command.includes('show')) {
+          const skill = command.replace(/find |show /, '');
+          let found = false;
+          skillItems.forEach(item => {
+            const skillName = item.querySelector('h3').textContent.toLowerCase();
+            if (skillName.includes(skill)) {
+              item.style.borderColor = 'var(--accent-color)';
+              item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              found = true;
+            } else {
+              item.style.display = 'none';
+            }
+          });
+          if (!found) {
+            alert('[ERROR] Skill not found');
+            skillItems.forEach(item => {
+              item.style.display = 'block';
+              item.style.borderColor = 'var(--text-color)';
+            });
+          }
+        } else {
+          alert('[ERROR] Invalid command');
+        }
+        skillSearch.value = '';
+      }
+    });
+
+    // Skill Filter
+    const filterButtons = document.querySelectorAll('.skill-filter button');
+    filterButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        filterButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        const filter = button.getAttribute('data-filter');
+        skillItems.forEach(item => {
+          const category = item.getAttribute('data-category');
+          item.style.display = filter === 'all' || category === filter ? 'block' : 'none';
+        });
+      });
+    });
+
+    // Error Log
+    const errorLog = document.getElementById('errorLog');
+    const errors = [
+      '[ERR] Skill too powerful',
+      '[ERR] Buffer overflow detected',
+      '[ERR] Unauthorized skill access',
+      '[ERR] System overloaded with knowledge'
+    ];
+    errorLog.addEventListener('click', () => {
+      const randomError = errors[Math.floor(Math.random() * errors.length)];
+      openModal(randomError);
+    });
+
+    // Download Skills
+    document.getElementById('downloadSkills').addEventListener('click', (e) => {
+      e.preventDefault();
+      const skillsText = `
+[RYZEN_SKILLS.TXT]
+Generated: ${new Date().toISOString()}
+---
+Penetration Testing: 90%
+  - Web app testing, SQL injection, XSS, Burp Suite mastery
+Red Teaming: 85%
+  - C2 frameworks, lateral movement, social engineering
+Exploitation: 80%
+  - Buffer overflows, privilege escalation, Metasploit
+Network Security: 85%
+  - Packet analysis, firewall configs, Nessus scans
+Automation: 75%
+  - Custom scripts in Python, Bash for recon and exploits
+Tools: 90%
+  - Burp Suite, Metasploit, Splunk, ELK Stack, Nessus
+Languages: 80%
+  - C++ (low-level exploits), Python (scripting), Bash (automation)
+---
+[END]
+      `;
+      try {
+        const blob = new Blob([skillsText], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'ryzen_skills.txt';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } catch (error) {
+        alert('[ERROR] Download failed. Try again.');
+      }
+    });
+
+    // Contact Form Validation
+    const form = document.querySelector('.contact-form');
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const message = document.getElementById('message').value;
+
+      if (name && email && message) {
+        alert('[SUCCESS] Packet transmitted! (Demo: Integrate with Formspree for live submissions.)');
+        form.reset();
+      } else {
+        alert('[ERROR] Invalid packet data.');
+        form.classList.add('error');
+        setTimeout(() => form.classList.remove('error'), 300);
+      }
+    });
+
+    // Easter Egg
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.key === '/') {
+        const input = prompt('> Enter command:');
+        if (input && input.toLowerCase() === 'whoami') {
+          alert('[RESPONSE] Ryzen: Bug Hunter Extraordinaire');
+        } else {
+          alert('[ERROR] Command not found');
+        }
+      }
+    });
+
+    // Keyboard Shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.key === 't') {
+        e.preventDefault();
+        document.getElementById('skills').scrollIntoView({ behavior: 'smooth' });
+      }
+      if (e.ctrlKey && e.key === 'c') {
+        e.preventDefault();
+        alert('[INTERRUPT] Hack cancelled... or was it?');
+      }
+    });
+
+    const hackAlert = document.getElementById('hackAlert');
+    const alerts = [
+      '[ALERT] Unauthorized access attempt',
+      '[ALERT] Firewall active',
+      '[ALERT] Scanning ports... [OK]',
+      '[ALERT] System secure'
+    ];
+    function updateAlert() {
+      const randomAlert = alerts[Math.floor(Math.random() * alerts.length)];
+      hackAlert.textContent = randomAlert;
+    }
+    window.addEventListener('load', () => {
+      updateAlert();
+      setInterval(updateAlert, 15000);
+    });
+
+    // System Time
+    const systemTime = document.getElementById('systemTime');
+    function updateTime() {
+      const now = new Date();
+      systemTime.textContent = `[TIME] ${now.toLocaleTimeString('en-US', { timeZone: 'Asia/Kolkata', hour12: true })} IST`;
+      requestAnimationFrame(updateTime);
+    }
+    updateTime();
+  </script>
+</body>
+</html>
