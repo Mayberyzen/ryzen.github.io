@@ -843,9 +843,7 @@
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         });
-
-        // Add hover sound effect simulation (visual feedback)
-        document.querySelectorAll('.competency-card, .cert-card, .social-btn').forEach(el => {
+        document.querySelectorAll('.competency-card, .cert-card, .social-btn').forEach(el => {        
             el.addEventListener('mouseenter', function() {
                 this.style.transform = 'translateX(5px) scale(1.02)';
             });
