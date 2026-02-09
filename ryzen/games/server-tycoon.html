@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Tycoon | Red Team Arcade</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --neon-green: #00ff41;
+            --neon-cyan: #00f0ff;
+            --neon-red: #ff0040;
+            --neon-orange: #ff6600;
+            --neon-purple: #b829dd;
+            --neon-yellow: #ffcc00;
+            --bg-dark: #050505;
+            --bg-panel: #0a0a0f;
+            --bg-card: #12121a;
+            --border-color: #2a2a3a;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg-dark);
+            color: #e0e0e0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        #matrixCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.15;
+        }
+
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.1) 50%);
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0.3;
+        }
+
+        .cyber-nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(5, 5, 5, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .logo::before { content: '['; color: var(--neon-red); }
+        .logo::after { content: ']'; color: var(--neon-red); }
+
+        .nav-link {
+            color: #888;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover { color: var(--neon-cyan); }
+
+        .game-container {
+            padding: 100px 2rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Mission Objective Banner */
+        .mission-banner {
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.1), rgba(0, 255, 65, 0.1));
+            border: 2px solid var(--neon-cyan);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .mission-banner h2 {
+            color: var(--neon-cyan);
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .mission-progress {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .mission-item {
+            text-align: center;
+        }
+
+        .mission-item.complete .mission-value {
+            color: var(--neon-green);
+        }
+
+        .mission-item.complete::after {
+            content: '✓';
+            color: var(--neon-green);
+            margin-left: 0.5rem;
+        }
+
+        .mission-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--neon-yellow);
+        }
+
+        .mission-label {
+            font-size: 0.75rem;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        /* Level Indicator */
+        .level-bar {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .level-badge {
+            background: var(--neon-purple);
+            color: var(--bg-dark);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 1.25rem;
+        }
+
+        .level-progress {
+            flex: 1;
+            height: 20px;
+            background: var(--bg-panel);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .level-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-purple), var(--neon-cyan));
+            width: 0%;
+            transition: width 0.5s ease-out;
+        }
+
+        .level-text {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 0 5px rgba(0,0,0,0.8);
+        }
+
+        /* Stats */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--neon-green), var(--neon-cyan));
+        }
+
+        .stat-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--neon-cyan);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        .stat-card.warning::before { background: var(--neon-orange); }
+        .stat-card.warning .stat-value { color: var(--neon-orange); }
+        .stat-card.danger::before { background: var(--neon-red); }
+        .stat-card.danger .stat-value { color: var(--neon-red); animation: pulse 1s infinite; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Game Grid */
+        .game-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        /* Server Room */
+        .server-room {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .room-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .room-title {
+            font-size: 1.25rem;
+            color: var(--neon-cyan);
+        }
+
+        .threat-meter {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .threat-bar {
+            width: 150px;
+            height: 8px;
+            background: var(--bg-panel);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .threat-fill {
+            height: 100%;
+            background: var(--neon-green);
+            width: 0%;
+            transition: all 0.3s;
+        }
+
+        .threat-fill.medium { background: var(--neon-orange); }
+        .threat-fill.high { background: var(--neon-red); animation: pulse 0.5s infinite; }
+
+        .racks-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            min-height: 400px;
+        }
+
+        .server-rack {
+            background: var(--bg-panel);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            position: relative;
+        }
+
+        .server-rack.owned {
+            border-color: var(--neon-green);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.1);
+        }
+
+        .rack-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+        }
+
+        .rack-name { color: var(--neon-cyan); font-weight: 700; }
+
+        .server-slots {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .server-unit {
+            background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1e 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .server-unit::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--neon-green);
+        }
+
+        .server-unit.web::before { background: var(--neon-cyan); }
+        .server-unit.db::before { background: var(--neon-purple); }
+        .server-unit.firewall::before { background: var(--neon-orange); }
+        .server-unit.ids::before { background: var(--neon-red); }
+
+        .server-lights {
+            display: flex;
+            gap: 3px;
+        }
+
+        .server-light {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #333;
+            animation: server-blink 1s infinite;
+        }
+
+        .server-light.active {
+            background: var(--neon-green);
+            box-shadow: 0 0 5px var(--neon-green);
+        }
+
+        .server-light.active:nth-child(2) { animation-delay: 0.2s; background: var(--neon-cyan); }
+        .server-light.active:nth-child(3) { animation-delay: 0.4s; background: var(--neon-red); }
+
+        @keyframes server-blink {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .server-info { flex: 1; }
+
+        .server-type {
+            font-size: 0.75rem;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        .empty-slot {
+            border: 2px dashed var(--border-color);
+            border-radius: 4px;
+            padding: 0.75rem;
+            text-align: center;
+            color: #555;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .empty-slot:hover {
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .panel-header {
+            font-size: 1rem;
+            color: var(--neon-cyan);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .upgrade-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .upgrade-item {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .upgrade-item:hover:not(.disabled) {
+            border-color: var(--neon-cyan);
+            transform: translateX(5px);
+        }
+
+        .upgrade-item.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .upgrade-item.maxed {
+            border-color: var(--neon-green);
+            background: rgba(0, 255, 65, 0.1);
+        }
+
+        .upgrade-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-card);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .upgrade-info { flex: 1; }
+
+        .upgrade-name {
+            font-weight: 700;
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .upgrade-desc {
+            font-size: 0.75rem;
+            color: #888;
+        }
+
+        .upgrade-cost {
+            color: var(--neon-orange);
+            font-weight: 700;
+            font-size: 0.875rem;
+        }
+
+        .upgrade-item.maxed .upgrade-cost {
+            color: var(--neon-green);
+        }
+
+        /* Log Panel */
+        .log-container {
+            max-height: 200px;
+            overflow-y: auto;
+            font-size: 0.75rem;
+        }
+
+        .log-entry {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-color);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .log-time { color: #666; margin-right: 0.5rem; }
+        .log-success { color: var(--neon-green); }
+        .log-warning { color: var(--neon-orange); }
+        .log-error { color: var(--neon-red); }
+        .log-info { color: var(--neon-cyan); }
+        .log-levelup { color: var(--neon-purple); font-weight: bold; }
+
+        /* Achievement Popup */
+        .achievement {
+            position: fixed;
+            top: 100px;
+            right: -400px;
+            background: var(--bg-card);
+            border: 2px solid var(--neon-yellow);
+            border-radius: 12px;
+            padding: 1.5rem;
+            width: 350px;
+            transition: right 0.5s ease-out;
+            z-index: 200;
+        }
+
+        .achievement.show {
+            right: 2rem;
+        }
+
+        .achievement-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .achievement-title {
+            color: var(--neon-yellow);
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .achievement-desc {
+            font-size: 0.875rem;
+            color: #888;
+        }
+
+        /* Victory Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border: 3px solid var(--neon-green);
+            border-radius: 20px;
+            padding: 3rem;
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            animation: victory-pulse 2s infinite;
+        }
+
+        @keyframes victory-pulse {
+            0%, 100% { box-shadow: 0 0 30px rgba(0, 255, 65, 0.3); }
+            50% { box-shadow: 0 0 60px rgba(0, 255, 65, 0.6); }
+        }
+
+        .modal h2 {
+            font-size: 3rem;
+            color: var(--neon-green);
+            margin-bottom: 1rem;
+        }
+
+        .victory-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .victory-stat {
+            background: var(--bg-panel);
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .victory-stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--neon-cyan);
+        }
+
+        .victory-stat-label {
+            font-size: 0.75rem;
+            color: #888;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            font-family: inherit;
+            font-weight: 700;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--neon-green);
+            color: var(--bg-dark);
+            font-size: 1.25rem;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.5);
+            transform: scale(1.05);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--neon-cyan);
+            border: 2px solid var(--neon-cyan);
+        }
+
+        .btn-secondary:hover {
+            background: var(--neon-cyan);
+            color: var(--bg-dark);
+        }
+
+        /* Start Screen */
+        .start-screen {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+
+        .start-screen.hidden {
+            display: none;
+        }
+
+        .start-content {
+            text-align: center;
+            max-width: 600px;
+            padding: 2rem;
+        }
+
+        .start-content h1 {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--neon-green), var(--neon-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .objectives-list {
+            text-align: left;
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .objectives-list h3 {
+            color: var(--neon-cyan);
+            margin-bottom: 1rem;
+        }
+
+        .objectives-list li {
+            margin-bottom: 0.75rem;
+            color: #888;
+            list-style: none;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .objectives-list li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: var(--neon-green);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .game-grid { grid-template-columns: 1fr; }
+            .stats-bar { grid-template-columns: repeat(3, 1fr); }
+            .mission-progress { gap: 1.5rem; }
+        }
+
+        @media (max-width: 640px) {
+            .stats-bar { grid-template-columns: repeat(2, 1fr); }
+            .racks-container { grid-template-columns: 1fr; }
+            .mission-banner h2 { font-size: 1.25rem; }
+            .mission-value { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrixCanvas"></canvas>
+    <div class="scanlines"></div>
+
+    <!-- Start Screen -->
+    <div class="start-screen" id="startScreen">
+        <div class="start-content">
+            <h1>SERVER TYCOON</h1>
+            <p style="color: #888; margin-bottom: 2rem;">Build the ultimate data center empire. Survive attacks. Reach Level 10.</p>
+            
+            <div class="objectives-list">
+                <h3>🎯 MISSION OBJECTIVES</h3>
+                <li>Deploy servers to earn credits</li>
+                <li>Maintain 1000+ customers</li>
+                <li>Keep security above 50</li>
+                <li>Survive increasing cyber attacks</li>
+                <li>Reach LEVEL 10 to win</li>
+            </div>
+            
+            <button class="btn btn-primary" onclick="startGame()" style="font-size: 1.25rem; padding: 1.25rem 3rem;">START MISSION</button>
+        </div>
+    </div>
+
+    <nav class="cyber-nav">
+        <div class="nav-container">
+            <a href="/" class="logo">RYZEN</a>
+            <a href="../games.html" class="nav-link">← BACK TO ARCADE</a>
+        </div>
+    </nav>
+
+    <div class="game-container" id="gameContainer" style="display: none;">
+        <!-- Mission Banner -->
+        <div class="mission-banner">
+            <h2>🎯 CURRENT OBJECTIVES</h2>
+            <div class="mission-progress">
+                <div class="mission-item" id="obj-customers">
+                    <div class="mission-value" id="obj-customers-val">0/1000</div>
+                    <div class="mission-label">Customers</div>
+                </div>
+                <div class="mission-item" id="obj-security">
+                    <div class="mission-value" id="obj-security-val">10/50</div>
+                    <div class="mission-label">Security</div>
+                </div>
+                <div class="mission-item" id="obj-servers">
+                    <div class="mission-value" id="obj-servers-val">0/20</div>
+                    <div class="mission-label">Servers</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Level Progress -->
+        <div class="level-bar">
+            <div class="level-badge" id="levelBadge">LVL 1</div>
+            <div class="level-progress">
+                <div class="level-fill" id="levelFill"></div>
+                <div class="level-text" id="levelText">0 / 1000 XP</div>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-bar">
+            <div class="stat-card" id="moneyCard">
+                <div class="stat-icon">💰</div>
+                <div class="stat-value" id="money">500</div>
+                <div class="stat-label">Credits</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🖥️</div>
+                <div class="stat-value" id="servers">0</div>
+                <div class="stat-label">Servers</div>
+            </div>
+            <div class="stat-card" id="powerCard">
+                <div class="stat-icon">⚡</div>
+                <div class="stat-value" id="power">50/50</div>
+                <div class="stat-label">Power</div>
+            </div>
+            <div class="stat-card" id="securityCard">
+                <div class="stat-icon">🛡️</div>
+                <div class="stat-value" id="security">10</div>
+                <div class="stat-label">Security</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-value" id="customers">0</div>
+                <div class="stat-label">Customers</div>
+            </div>
+        </div>
+
+        <div class="game-grid">
+            <!-- Server Room -->
+            <div class="server-room">
+                <div class="room-header">
+                    <span class="room-title">🖥️ DATA CENTER</span>
+                    <div class="threat-meter">
+                        <span style="font-size: 0.875rem; color: #888;">THREAT:</span>
+                        <div class="threat-bar">
+                            <div class="threat-fill" id="threatFill"></div>
+                        </div>
+                        <span id="threatText" style="font-size: 0.875rem; color: var(--neon-green);">LOW</span>
+                    </div>
+                </div>
+                <div class="racks-container" id="racksContainer">
+                    <div class="server-rack owned" data-rack="1">
+                        <div class="rack-header">
+                            <span class="rack-name">RACK-01</span>
+                            <span style="color: #888; font-size: 0.75rem;">4U SLOTS</span>
+                        </div>
+                        <div class="server-slots" id="rack-1-slots">
+                            <div class="empty-slot" onclick="focusShop()">+ Deploy Server</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="panel">
+                    <div class="panel-header">🛒 SERVER SHOP</div>
+                    <div class="upgrade-list">
+                        <div class="upgrade-item" onclick="buyServer('web')" id="shop-web">
+                            <div class="upgrade-icon">🌐</div>
+                            <div class="upgrade-info">
+                                <div class="upgrade-name">Web Server</div>
+                                <div class="upgrade-desc">+5 customers/sec | 10 power</div>
+                            </div>
+                            <div class="upgrade-cost">💰 150</div>
+                        </div>
+                        <div class="upgrade-item" onclick="buyServer('db')" id="shop-db">
+                            <div class="upgrade-icon">🗄️</div>
+                            <div class="upgrade-info">
+                                <div class="upgrade-name">Database</div>
+                                <div class="upgrade-desc">+12 customers/sec | 20 power</div>
+                            </div>
+                            <div class="upgrade-cost">💰 400</div>
+                        </div>
+                        <div class="upgrade-item" onclick="buyServer('firewall')" id="shop-firewall">
+                            <div class="upgrade-icon">🔥</div>
+                            <div class="upgrade-info">
+                                <div class="upgrade-name">Firewall</div>
+                                <div class="upgrade-desc">+10 security | 15 power</div>
+                            </div>
+                            <div class="upgrade-cost">💰 250</div>
+                        </div>
+                        <div class="upgrade-item" onclick="buyServer('ids')" id="shop-ids">
+                            <div class="upgrade-icon">👁️</div>
+                            <div class="upgrade-info">
+                                <div class="upgrade-name">IDS System</div>
+                                <div class="upgrade-desc">+20 security | 25 power</div>
+                            </div>
+                            <div class="upgrade-cost">💰 600</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">🏗️ INFRASTRUCTURE</div>
+                    <div class="upgrade-list">
+                        <div class="upgrade-item" onclick="buyRack()" id="shop-rack">
+                            <div class="upgrade-icon">📦</div>
+                            <div class="upgrade-info">
+                                <div class="upgrade-name">Server Rack</div>
+                                <div class="upgrade-desc">+4 server slots</div>
+                            </div>
+                            <div class="upgrade-cost">💰 1000</div>
+                        </div>
+                        <div class="upgrade-item" onclick="upgradePower()" id="shop-power">
+                            <div class="upgrade-icon">⚡</div>
+                            <div class="upgrade-info">
+                                <div class="upgrade-name">Power Upgrade</div>
+                                <div class="upgrade-desc">+50 power capacity</div>
+                            </div>
+                            <div class="upgrade-cost">💰 500</div>
+                        </div>
+                        <div class="upgrade-item" onclick="upgradeCooling()" id="shop-cooling">
+                            <div class="upgrade-icon">❄️</div>
+                            <div class="upgrade-info">
+                                <div class="upgrade-name">Cooling System</div>
+                                <div class="upgrade-desc">-20% power consumption</div>
+                            </div>
+                            <div class="upgrade-cost">💰 800</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">📋 SYSTEM LOG</div>
+                    <div class="log-container" id="logContainer">
+                        <div class="log-entry">
+                            <span class="log-time">[00:00:00]</span>
+                            <span class="log-info">Data center initialized. Level 1</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Achievement Popup -->
+    <div class="achievement" id="achievement">
+        <div class="achievement-icon" id="achIcon">🏆</div>
+        <div class="achievement-title" id="achTitle">Achievement Unlocked!</div>
+        <div class="achievement-desc" id="achDesc">Description here</div>
+    </div>
+
+    <!-- Victory Modal -->
+    <div class="modal-overlay" id="victoryModal">
+        <div class="modal">
+            <h2>🎉 VICTORY! 🎉</h2>
+            <p style="color: #888; margin-bottom: 1rem;">You have built a tier-1 data center empire!</p>
+            
+            <div class="victory-stats">
+                <div class="victory-stat">
+                    <div class="victory-stat-value" id="vicLevel">10</div>
+                    <div class="victory-stat-label">Final Level</div>
+                </div>
+                <div class="victory-stat">
+                    <div class="victory-stat-value" id="vicServers">0</div>
+                    <div class="victory-stat-label">Total Servers</div>
+                </div>
+                <div class="victory-stat">
+                    <div class="victory-stat-value" id="vicCustomers">0</div>
+                    <div class="victory-stat-label">Peak Customers</div>
+                </div>
+                <div class="victory-stat">
+                    <div class="victory-stat-value" id="vicMoney">0</div>
+                    <div class="victory-stat-label">Total Earnings</div>
+                </div>
+            </div>
+            
+            <p id="rankText" style="color: var(--neon-cyan); font-size: 1.25rem; margin: 1rem 0;">
+                RANK: ELITE SYSADMIN
+            </p>
+            
+            <button class="btn btn-primary" onclick="location.reload()">PLAY AGAIN</button>
+            <a href="../games.html" class="btn btn-secondary">BACK TO ARCADE</a>
+        </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div class="modal-overlay" id="gameOverModal">
+        <div class="modal" style="border-color: var(--neon-red); animation: none;">
+            <h2 style="color: var(--neon-red);">💀 GAME OVER</h2>
+            <p id="failReason" style="color: #888; margin-bottom: 1rem;">Your data center collapsed</p>
+            
+            <div class="victory-stats">
+                <div class="victory-stat">
+                    <div class="victory-stat-value" id="failLevel" style="color: var(--neon-red);">5</div>
+                    <div class="victory-stat-label">Level Reached</div>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" style="background: var(--neon-red);" onclick="location.reload()">TRY AGAIN</button>
+        </div>
+    </div>
+
+    <script src="../js/matrix.js"></script>
+    <script>
+        // Game State
+        const game = {
+            money: 500,
+            power: 50,
+            powerUsed: 0,
+            powerMax: 50,
+            security: 10,
+            servers: 0,
+            customers: 0,
+            racks: 1,
+            level: 1,
+            xp: 0,
+            xpNeeded: 1000,
+            threat: 0,
+            totalEarned: 0,
+            coolingLevel: 0,
+            isPlaying: false,
+            serverTypes: {
+                web: { cost: 150, power: 10, customers: 5, security: 0, name: 'Web Server', xp: 50 },
+                db: { cost: 400, power: 20, customers: 12, security: 0, name: 'Database', xp: 120 },
+                firewall: { cost: 250, power: 15, customers: 0, security: 10, name: 'Firewall', xp: 80 },
+                ids: { cost: 600, power: 25, customers: 0, security: 20, name: 'IDS', xp: 200 }
+            },
+            prices: { rack: 1000, power: 500, cooling: 800 }
+        };
+
+        let gameLoop, threatLoop, customerLoop, achievementCheck;
+        let achievements = [];
+
+        function startGame() {
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('gameContainer').style.display = 'block';
+            game.isPlaying = true;
+            
+            addLog('Mission started! Build your empire.', 'success');
+            addLog('Goal: Reach Level 10 with 1000+ customers', 'info');
+            
+            initLoops();
+            updateDisplay();
+        }
+
+        function initLoops() {
+            // Income loop (every second)
+            customerLoop = setInterval(() => {
+                if (!game.isPlaying) return;
+                
+                const income = game.customers * 0.5;
+                game.money += income;
+                game.totalEarned += income;
+                
+                // XP from customers
+                if (game.customers > 0) {
+                    addXP(game.customers * 0.1);
+                }
+                
+                updateDisplay();
+                checkObjectives();
+            }, 1000);
+
+            // Customer growth (every 3 seconds)
+            setInterval(() => {
+                if (!game.isPlaying) return;
+                
+                if (game.servers > 0 && game.customers < game.servers * 50) {
+                    const growth = Math.floor(Math.random() * 3) + 1;
+                    game.customers += growth;
+                    addLog(`+${growth} new customers!`, 'success');
+                    updateDisplay();
+                }
+            }, 3000);
+
+            // Threat increase (every 5 seconds)
+            threatLoop = setInterval(() => {
+                if (!game.isPlaying) return;
+                
+                game.threat = Math.min(100, game.threat + 2 + (game.level * 0.5));
+                
+                // Attack chance based on threat
+                if (Math.random() < game.threat / 200) {
+                    triggerAttack();
+                }
+                
+                updateThreatDisplay();
+            }, 5000);
+
+            // Achievement check
+            achievementCheck = setInterval(checkAchievements, 1000);
+        }
+
+        function addXP(amount) {
+            game.xp += amount;
+            
+            if (game.xp >= game.xpNeeded) {
+                levelUp();
+            }
+            
+            updateLevelDisplay();
+        }
+
+        function levelUp() {
+            game.level++;
+            game.xp -= game.xpNeeded;
+            game.xpNeeded = Math.floor(game.xpNeeded * 1.5);
+            
+            // Rewards
+            const bonus = game.level * 100;
+            game.money += bonus;
+            
+            addLog(`🎉 LEVEL UP! Now Level ${game.level}`, 'levelup');
+            addLog(`Bonus: 💰${bonus} credits!`, 'success');
+            
+            showAchievement('📈', `Level ${game.level} Reached!`, `Bonus: 💰${bonus} credits`);
+            
+            // Check win condition
+            if (game.level >= 10) {
+                victory();
+            }
+            
+            updateDisplay();
+        }
+
+        function buyServer(type) {
+            const srv = game.serverTypes[type];
+            
+            if (game.money < srv.cost) {
+                addLog('Insufficient funds!', 'error');
+                return;
+            }
+            
+            // Check power with cooling bonus
+            const powerCost = Math.floor(srv.power * (1 - game.coolingLevel * 0.2));
+            if (game.powerUsed + powerCost > game.powerMax) {
+                addLog('Not enough power! Upgrade power first.', 'warning');
+                return;
+            }
+            
+            // Find available rack
+            let targetRack = null;
+            for (let i = 1; i <= game.racks; i++) {
+                const slots = document.querySelectorAll(`#rack-${i}-slots .server-unit`).length;
+                if (slots < 4) {
+                    targetRack = i;
+                    break;
+                }
+            }
+            
+            if (!targetRack) {
+                addLog('No available rack slots! Buy a new rack.', 'warning');
+                return;
+            }
+            
+            // Purchase
+            game.money -= srv.cost;
+            game.powerUsed += powerCost;
+            game.servers++;
+            game.customers += srv.customers;
+            game.security += srv.security;
+            
+            addXP(srv.xp);
+            addServerToRack(targetRack, type);
+            
+            addLog(`${srv.name} deployed! +${srv.xp} XP`, 'success');
+            updateDisplay();
+        }
+
+        function addServerToRack(rackId, type) {
+            const slots = document.getElementById(`rack-${rackId}-slots`);
+            const srv = game.serverTypes[type];
+            
+            const empty = slots.querySelector('.empty-slot');
+            if (empty) empty.remove();
+            
+            const unit = document.createElement('div');
+            unit.className = `server-unit ${type}`;
+            unit.innerHTML = `
+                <div class="server-lights">
+                    <span class="server-light active"></span>
+                    <span class="server-light active"></span>
+                    <span class="server-light active"></span>
+                </div>
+                <div class="server-info">
+                    <div class="server-type">${srv.name}</div>
+                </div>
+            `;
+            
+            slots.appendChild(unit);
+            
+            if (slots.children.length < 4) {
+                const newEmpty = document.createElement('div');
+                newEmpty.className = 'empty-slot';
+                newEmpty.onclick = focusShop;
+                newEmpty.textContent = '+ Deploy Server';
+                slots.appendChild(newEmpty);
+            }
+        }
+
+        function buyRack() {
+            if (game.money < game.prices.rack) {
+                addLog('Insufficient funds!', 'error');
+                return;
+            }
+            
+            game.money -= game.prices.rack;
+            game.racks++;
+            game.prices.rack = Math.floor(game.prices.rack * 1.3);
+            
+            const container = document.getElementById('racksContainer');
+            const rack = document.createElement('div');
+            rack.className = 'server-rack owned';
+            rack.innerHTML = `
+                <div class="rack-header">
+                    <span class="rack-name">RACK-0${game.racks}</span>
+                    <span style="color: #888; font-size: 0.75rem;">4U SLOTS</span>
+                </div>
+                <div class="server-slots" id="rack-${game.racks}-slots">
+                    <div class="empty-slot" onclick="focusShop()">+ Deploy Server</div>
+                </div>
+            `;
+            container.appendChild(rack);
+            
+            addXP(300);
+            addLog(`Rack-0${game.racks} constructed! +300 XP`, 'success');
+            updateDisplay();
+        }
+
+        function upgradePower() {
+            if (game.money < game.prices.power) {
+                addLog('Insufficient funds!', 'error');
+                return;
+            }
+            
+            game.money -= game.prices.power;
+            game.powerMax += 50;
+            game.prices.power = Math.floor(game.prices.power * 1.25);
+            
+            addXP(150);
+            addLog('Power upgraded! +50 capacity', 'success');
+            updateDisplay();
+        }
+
+        function upgradeCooling() {
+            if (game.coolingLevel >= 3) {
+                addLog('Cooling already maxed!', 'warning');
+                return;
+            }
+            
+            if (game.money < game.prices.cooling) {
+                addLog('Insufficient funds!', 'error');
+                return;
+            }
+            
+            game.money -= game.prices.cooling;
+            game.coolingLevel++;
+            game.prices.cooling = Math.floor(game.prices.cooling * 1.5);
+            
+            addXP(250);
+            addLog(`Cooling Level ${game.coolingLevel}! -20% power usage`, 'success');
+            updateDisplay();
+        }
+
+        function triggerAttack() {
+            const attackPower = Math.floor(Math.random() * 40) + (game.level * 5);
+            const defense = game.security;
+            
+            addLog(`🚨 Cyber attack! Strength: ${attackPower}`, 'error');
+            
+            if (defense >= attackPower) {
+                // Defended
+                const bounty = Math.floor(attackPower * 2);
+                game.money += bounty;
+                game.threat = Math.max(0, game.threat - 10);
+                addLog(`Attack repelled! Bounty: 💰${bounty}`, 'success');
+                addXP(attackPower);
+            } else {
+                // Breach
+                const damage = attackPower - defense;
+                const lostCustomers = Math.floor(damage / 2);
+                const lostMoney = Math.floor(game.money * 0.1);
+                
+                game.customers = Math.max(0, game.customers - lostCustomers);
+                game.money -= lostMoney;
+                game.threat = Math.min(100, game.threat + 15);
+                
+                addLog(`BREACH! Lost ${lostCustomers} customers, 💰${lostMoney}`, 'error');
+                
+                // Visual shake
+                document.querySelectorAll('.server-rack').forEach(r => {
+                    r.style.animation = 'shake 0.5s';
+                    setTimeout(() => r.style.animation = '', 500);
+                });
+                
+                // Fail condition
+                if (game.customers === 0 && game.servers > 5) {
+                    gameOver('All customers lost due to security breach');
+                }
+            }
+            
+            updateDisplay();
+        }
+
+        function checkAchievements() {
+            const checks = [
+                { id: 'first_server', condition: game.servers >= 1, icon: '🖥️', title: 'First Deployment', desc: 'Deploy your first server' },
+                { id: 'rack_master', condition: game.racks >= 3, icon: '📦', title: 'Rack Master', desc: 'Own 3 server racks' },
+                { id: 'popular', condition: game.customers >= 100, icon: '👥', title: 'Going Viral', desc: 'Reach 100 customers' },
+                { id: 'fortress', condition: game.security >= 100, icon: '🏰', title: 'Fortress', desc: 'Achieve 100 security' },
+                { id: 'rich', condition: game.money >= 10000, icon: '💎', title: 'Data Center Tycoon', desc: 'Have 10,000 credits' },
+                { id: 'survivor', condition: game.level >= 5, icon: '🛡️', title: 'Survivor', desc: 'Reach Level 5' }
+            ];
+            
+            checks.forEach(check => {
+                if (check.condition && !achievements.includes(check.id)) {
+                    achievements.push(check.id);
+                    showAchievement(check.icon, check.title, check.desc);
+                    addXP(500);
+                }
+            });
+        }
+
+        function showAchievement(icon, title, desc) {
+            const ach = document.getElementById('achievement');
+            document.getElementById('achIcon').textContent = icon;
+            document.getElementById('achTitle').textContent = title;
+            document.getElementById('achDesc').textContent = desc;
+            
+            ach.classList.add('show');
+            setTimeout(() => ach.classList.remove('show'), 4000);
+        }
+
+        function checkObjectives() {
+            // Update objective display
+            document.getElementById('obj-customers-val').textContent = `${game.customers}/1000`;
+            document.getElementById('obj-security-val').textContent = `${game.security}/50`;
+            document.getElementById('obj-servers-val').textContent = `${game.servers}/20`;
+            
+            // Mark complete
+            document.getElementById('obj-customers').classList.toggle('complete', game.customers >= 1000);
+            document.getElementById('obj-security').classList.toggle('complete', game.security >= 50);
+            document.getElementById('obj-servers').classList.toggle('complete', game.servers >= 20);
+        }
+
+        function victory() {
+            game.isPlaying = false;
+            clearInterval(customerLoop);
+            clearInterval(threatLoop);
+            clearInterval(achievementCheck);
+            
+            document.getElementById('vicServers').textContent = game.servers;
+            document.getElementById('vicCustomers').textContent = game.customers;
+            document.getElementById('vicMoney').textContent = Math.floor(game.totalEarned);
+            
+            const ranks = ['SCRIPT KIDDIE', 'SYSADMIN', 'SECURITY ENGINEER', 'CISO', 'ELITE SYSADMIN'];
+            const rank = ranks[Math.min(4, Math.floor(game.security / 25))];
+            document.getElementById('rankText').textContent = `RANK: ${rank}`;
+            
+            document.getElementById('victoryModal').classList.add('active');
+        }
+
+        function gameOver(reason) {
+            game.isPlaying = false;
+            clearInterval(customerLoop);
+            clearInterval(threatLoop);
+            clearInterval(achievementCheck);
+            
+            document.getElementById('failReason').textContent = reason;
+            document.getElementById('failLevel').textContent = game.level;
+            document.getElementById('gameOverModal').classList.add('active');
+        }
+
+        function updateDisplay() {
+            // Stats
+            document.getElementById('money').textContent = Math.floor(game.money);
+            document.getElementById('servers').textContent = game.servers;
+            document.getElementById('power').textContent = `${game.powerUsed}/${game.powerMax}`;
+            document.getElementById('security').textContent = game.security;
+            document.getElementById('customers').textContent = game.customers;
+            
+            // Warnings
+            const powerPct = game.powerUsed / game.powerMax;
+            document.getElementById('powerCard').className = 'stat-card' + 
+                (powerPct > 0.9 ? ' danger' : powerPct > 0.7 ? ' warning' : '');
+            
+            document.getElementById('securityCard').className = 'stat-card' + 
+                (game.threat > 70 ? ' danger' : game.threat > 40 ? ' warning' : '');
+            
+            document.getElementById('moneyCard').className = 'stat-card' + 
+                (game.money < 200 ? ' warning' : '');
+            
+            // Shop
+            document.querySelector('#shop-rack .upgrade-cost').textContent = `💰 ${game.prices.rack}`;
+            document.querySelector('#shop-power .upgrade-cost').textContent = `💰 ${game.prices.power}`;
+            
+            const coolBtn = document.getElementById('shop-cooling');
+            if (game.coolingLevel >= 3) {
+                coolBtn.classList.add('maxed');
+                coolBtn.querySelector('.upgrade-cost').textContent = '✓ MAXED';
+            } else {
+                coolBtn.querySelector('.upgrade-cost').textContent = `💰 ${game.prices.cooling}`;
+            }
+            
+            document.querySelectorAll('.upgrade-item').forEach(item => {
+                const costText = item.querySelector('.upgrade-cost').textContent;
+                const cost = parseInt(costText.replace(/[^0-9]/g, '')) || 0;
+                item.classList.toggle('disabled', cost > 0 && game.money < cost);
+            });
+            
+            updateLevelDisplay();
+            updateThreatDisplay();
+            checkObjectives();
+        }
+
+        function updateLevelDisplay() {
+            document.getElementById('levelBadge').textContent = `LVL ${game.level}`;
+            const pct = (game.xp / game.xpNeeded) * 100;
+            document.getElementById('levelFill').style.width = `${pct}%`;
+            document.getElementById('levelText').textContent = `${Math.floor(game.xp)} / ${game.xpNeeded} XP`;
+        }
+
+        function updateThreatDisplay() {
+            const fill = document.getElementById('threatFill');
+            const text = document.getElementById('threatText');
+            
+            fill.style.width = `${game.threat}%`;
+            fill.className = 'threat-fill' + 
+                (game.threat > 70 ? ' high' : game.threat > 40 ? ' medium' : '');
+            
+            const labels = ['LOW', 'ELEVATED', 'HIGH', 'CRITICAL'];
+            const labelIndex = Math.floor(game.threat / 25);
+            text.textContent = labels[Math.min(3, labelIndex)];
+            text.style.color = game.threat > 70 ? 'var(--neon-red)' : 
+                              game.threat > 40 ? 'var(--neon-orange)' : 'var(--neon-green)';
+        }
+
+        function focusShop() {
+            document.querySelector('.sidebar').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function addLog(msg, type) {
+            const container = document.getElementById('logContainer');
+            const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `<span class="log-time">[${time}]</span> <span class="log-${type}">${msg}</span>`;
+            container.insertBefore(entry, container.firstChild);
+            while (container.children.length > 20) container.removeChild(container.lastChild);
+        }
+
+        // Init
+        setInterval(() => {
+            if (game.isPlaying) updateDisplay();
+        }, 100);
+    </script>
+</body>
+</html>

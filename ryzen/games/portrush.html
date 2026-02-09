@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PortRush | Red Team Arcade</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <style>
+        .game-container {
+            min-height: 100vh;
+            padding: 100px 2rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .game-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .game-header h1 {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .game-stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .stat-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem 2.5rem;
+            text-align: center;
+            min-width: 140px;
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent-cyan);
+            font-family: var(--font-display);
+            text-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+        }
+        
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .game-area {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            position: relative;
+        }
+        
+        .target-display {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--accent-cyan);
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: var(--font-mono);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .target-info {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .target-info span {
+            color: var(--text-secondary);
+        }
+        
+        .target-info strong {
+            color: var(--accent-cyan);
+        }
+        
+        .timer-bar {
+            width: 200px;
+            height: 8px;
+            background: var(--bg-primary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .timer-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-green), var(--accent-cyan));
+            width: 100%;
+            transition: width 0.1s linear;
+        }
+        
+        .timer-fill.warning {
+            background: linear-gradient(90deg, var(--accent-orange), var(--accent-red));
+        }
+        
+        .scan-interface {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .port-input-section {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+        
+        .port-input-section h4 {
+            color: var(--accent-cyan);
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+        }
+        
+        .port-input-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .port-input {
+            flex: 1;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.75rem;
+            border-radius: 4px;
+            font-family: var(--font-mono);
+            font-size: 1rem;
+        }
+        
+        .port-input:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+        }
+        
+        .btn-scan {
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        
+        .btn-scan:hover:not(:disabled) {
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+        }
+        
+        .btn-scan:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .quick-ports {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .quick-port {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+            transition: all 0.3s;
+        }
+        
+        .quick-port:hover:not(:disabled) {
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+        
+        .quick-port:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        
+        .port-grid-section {
+            background: var(--bg-primary);
+            border-radius: 8px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+        
+        .port-grid-section h4 {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+            text-align: center;
+        }
+        
+        .port-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 0.5rem;
+        }
+        
+        .port-cell {
+            aspect-ratio: 1;
+            background: var(--bg-tertiary);
+            border: 2px solid transparent;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: default;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .port-cell::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--text-secondary);
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+        
+        .port-cell.scanned::before {
+            background: var(--accent-red);
+        }
+        
+        .port-cell.open {
+            border-color: var(--accent-green);
+            background: rgba(0, 255, 65, 0.1);
+        }
+        
+        .port-cell.open::before {
+            background: var(--accent-green);
+            box-shadow: 0 0 10px var(--accent-green);
+        }
+        
+        .port-cell.locked {
+            background: var(--bg-primary);
+            opacity: 0.3;
+        }
+        
+        .port-cell.locked::before {
+            background: var(--border-color);
+        }
+        
+        .port-cell.current-scan {
+            animation: scan-pulse 0.5s;
+        }
+        
+        @keyframes scan-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); border-color: var(--accent-cyan); }
+        }
+        
+        .service-hint {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .service-hint h4 {
+            color: var(--accent-cyan);
+            margin-bottom: 0.75rem;
+            font-size: 0.875rem;
+        }
+        
+        .hint-list {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .hint-item {
+            background: var(--bg-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+        
+        .hint-item.found {
+            background: rgba(0, 255, 65, 0.1);
+            color: var(--accent-green);
+            border-color: var(--accent-green);
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .btn-game {
+            padding: 1rem 2rem;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .btn-start {
+            background: var(--accent-green);
+            color: var(--bg-primary);
+        }
+        
+        .btn-start:hover:not(:disabled) {
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .btn-start:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn-reset {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+        
+        .btn-reset:hover {
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+        
+        .difficulty-select {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .diff-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: var(--font-mono);
+        }
+        
+        .diff-btn:hover:not(:disabled) {
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+        
+        .diff-btn.active {
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+            background: rgba(0, 240, 255, 0.1);
+        }
+        
+        .diff-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .scan-log {
+            background: var(--bg-primary);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            max-height: 150px;
+            overflow-y: auto;
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+        }
+        
+        .log-entry {
+            margin-bottom: 0.5rem;
+            opacity: 0;
+            animation: fadeIn 0.3s forwards;
+        }
+        
+        .log-time {
+            color: var(--text-secondary);
+            margin-right: 0.5rem;
+        }
+        
+        .log-success { color: var(--accent-green); }
+        .log-error { color: var(--accent-red); }
+        .log-info { color: var(--accent-cyan); }
+        
+        .game-over-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(5, 5, 5, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .game-over-modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--bg-card);
+            border: 2px solid var(--accent-cyan);
+            border-radius: 16px;
+            padding: 3rem;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            animation: scaleIn 0.3s ease-out;
+        }
+        
+        @keyframes scaleIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        .modal-content h2 {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            color: var(--accent-cyan);
+            margin-bottom: 1.5rem;
+        }
+        
+        .final-stats {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .final-stat {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .final-stat:last-child {
+            border-bottom: none;
+        }
+        
+        .btn-close {
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
+            border: none;
+            padding: 1rem 3rem;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .scan-interface {
+                grid-template-columns: 1fr;
+            }
+            
+            .port-grid {
+                grid-template-columns: repeat(10, 1fr);
+                gap: 0.25rem;
+            }
+            
+            .port-cell::before {
+                width: 4px;
+                height: 4px;
+            }
+            
+            .game-stats {
+                gap: 1rem;
+            }
+            
+            .stat-box {
+                padding: 1rem;
+                min-width: 80px;
+            }
+            
+            .stat-value {
+                font-size: 1.5rem;
+            }
+            
+            .quick-ports {
+                gap: 0.25rem;
+            }
+            
+            .quick-port {
+                padding: 0.4rem 0.6rem;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrixCanvas" class="matrix-bg"></canvas>
+    <div class="scanlines"></div>
+    
+    <nav class="cyber-nav">
+        <div class="nav-container">
+            <a href="/" class="logo">[RYZEN]</a>
+            <a href="../games.html" class="nav-link">← BACK TO ARCADE</a>
+        </div>
+    </nav>
+
+    <div class="game-container">
+        <div class="game-header">
+            <h1>PORTRUSH</h1>
+            <p>Scan ports. Find services. Avoid the IDS.</p>
+        </div>
+
+        <div class="game-stats">
+            <div class="stat-box">
+                <div class="stat-value" id="score">0</div>
+                <div class="stat-label">Score</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="time">60</div>
+                <div class="stat-label">Time</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="found">0</div>
+                <div class="stat-label">Found</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="strikes">0</div>
+                <div class="stat-label">Strikes</div>
+            </div>
+        </div>
+
+        <div class="game-area">
+            <div class="difficulty-select">
+                <button class="diff-btn active" onclick="setDifficulty('easy')" id="diff-easy">Easy</button>
+                <button class="diff-btn" onclick="setDifficulty('medium')" id="diff-medium">Medium</button>
+                <button class="diff-btn" onclick="setDifficulty('hard')" id="diff-hard">Hard</button>
+            </div>
+
+            <div class="target-display">
+                <div class="target-info">
+                    <span>Target: <strong id="targetIp">192.168.1.100</strong></span>
+                    <span>Status: <strong id="targetStatus">STANDBY</strong></span>
+                    <span>Range: <strong>1-1000</strong></span>
+                </div>
+                <div class="timer-bar">
+                    <div class="timer-fill" id="timerBar"></div>
+                </div>
+            </div>
+
+            <div class="service-hint">
+                <h4>🎯 TARGET SERVICES TO FIND:</h4>
+                <div class="hint-list" id="hintList">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <div class="scan-interface">
+                <div class="port-input-section">
+                    <h4>PORT SCANNER</h4>
+                    <div class="port-input-group">
+                        <input type="number" class="port-input" id="portInput" placeholder="Enter port (1-1000)" min="1" max="1000">
+                        <button class="btn-scan" id="scanBtn" onclick="scanPort()">SCAN</button>
+                    </div>
+                    
+                    <h4 style="margin-top: 1rem; margin-bottom: 0.5rem; font-size: 0.75rem; color: var(--text-secondary);">QUICK SELECT</h4>
+                    <div class="quick-ports" id="quickPorts">
+                        <button class="quick-port" onclick="setPort(22)">22</button>
+                        <button class="quick-port" onclick="setPort(80)">80</button>
+                        <button class="quick-port" onclick="setPort(443)">443</button>
+                        <button class="quick-port" onclick="setPort(3306)">3306</button>
+                        <button class="quick-port" onclick="setPort(8080)">8080</button>
+                    </div>
+                    
+                    <div class="scan-log" id="scanLog">
+                        <div class="log-entry">
+                            <span class="log-time">[00:00:00]</span>
+                            <span class="log-info">Scanner ready. Enter port number to begin.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="port-grid-section">
+                    <h4>NETWORK VISUALIZATION</h4>
+                    <div class="port-grid" id="portGrid">
+                        <!-- 100 cells representing port ranges -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="btn-game btn-start" id="startBtn" onclick="startGame()">▶ INITIATE SCAN</button>
+                <button class="btn-game btn-reset" onclick="resetGame()">↻ ABORT</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="game-over-modal" id="gameOverModal">
+        <div class="modal-content">
+            <h2 id="endTitle">SCAN COMPLETE</h2>
+            <div class="final-stats">
+                <div class="final-stat">
+                    <span>Services Found</span>
+                    <span id="finalFound">0/4</span>
+                </div>
+                <div class="final-stat">
+                    <span>Ports Scanned</span>
+                    <span id="finalScanned">0</span>
+                </div>
+                <div class="final-stat">
+                    <span>Accuracy</span>
+                    <span id="finalAccuracy">0%</span>
+                </div>
+                <div class="final-stat">
+                    <span>Time Bonus</span>
+                    <span id="finalTimeBonus">0</span>
+                </div>
+                <div class="final-stat">
+                    <span style="color: var(--accent-cyan); font-weight: 700;">Total Score</span>
+                    <span id="finalScore" style="color: var(--accent-cyan); font-weight: 700;">0</span>
+                </div>
+            </div>
+            <button class="btn-close" onclick="closeModal()">New Mission</button>
+        </div>
+    </div>
+
+    <script src="../js/matrix.js"></script>
+    <script>
+        // Game State
+        const gameState = {
+            isPlaying: false,
+            score: 0,
+            timeLeft: 60,
+            found: 0,
+            strikes: 0,
+            difficulty: 'easy',
+            targetServices: [],
+            scannedPorts: [],
+            foundServices: [],
+            timer: null,
+            idsTimer: null
+        };
+
+        const difficulties = {
+            easy: { time: 60, idsInterval: 8000, services: 4, range: 100 },
+            medium: { time: 45, idsInterval: 6000, services: 5, range: 500 },
+            hard: { time: 30, idsInterval: 4000, services: 6, range: 1000 }
+        };
+
+        const commonPorts = {
+            21: 'FTP', 22: 'SSH', 23: 'Telnet', 25: 'SMTP',
+            53: 'DNS', 80: 'HTTP', 110: 'POP3', 143: 'IMAP',
+            443: 'HTTPS', 445: 'SMB', 3306: 'MySQL', 3389: 'RDP',
+            5432: 'PostgreSQL', 8080: 'HTTP-Proxy', 8443: 'HTTPS-Alt',
+            27017: 'MongoDB', 6379: 'Redis', 9200: 'Elasticsearch'
+        };
+
+        // Initialize
+        function init() {
+            generateGrid();
+            updateHints();
+            
+            // Enter key support
+            document.getElementById('portInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') scanPort();
+            });
+        }
+
+        function generateGrid() {
+            const grid = document.getElementById('portGrid');
+            grid.innerHTML = '';
+            // 100 cells representing port ranges
+            for (let i = 0; i < 100; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'port-cell';
+                cell.id = `cell-${i}`;
+                grid.appendChild(cell);
+            }
+        }
+
+        function setDifficulty(level) {
+            if (gameState.isPlaying) return; // Lock during game
+            
+            gameState.difficulty = level;
+            
+            document.querySelectorAll('.diff-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`diff-${level}`).classList.add('active');
+            
+            updateHints();
+        }
+
+        function updateHints() {
+            const count = difficulties[gameState.difficulty].services;
+            const services = Object.entries(commonPorts)
+                .sort(() => Math.random() - 0.5)
+                .slice(0, count);
+            
+            gameState.targetServices = services;
+            
+            const hintList = document.getElementById('hintList');
+            hintList.innerHTML = services.map(([port, service]) => `
+                <span class="hint-item" id="hint-${port}">${service}</span>
+            `).join('');
+        }
+
+        function setPort(port) {
+            document.getElementById('portInput').value = port;
+        }
+
+        function startGame() {
+            if (gameState.isPlaying) return;
+            
+            gameState.isPlaying = true;
+            gameState.score = 0;
+            gameState.found = 0;
+            gameState.strikes = 0;
+            gameState.scannedPorts = [];
+            gameState.foundServices = [];
+            gameState.timeLeft = difficulties[gameState.difficulty].time;
+            
+            // Lock UI
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('startBtn').textContent = '⏳ SCANNING...';
+            document.getElementById('scanBtn').disabled = false;
+            document.getElementById('portInput').disabled = false;
+            
+            // Lock difficulty
+            document.querySelectorAll('.diff-btn').forEach(btn => {
+                btn.disabled = true;
+            });
+            
+            // Reset grid
+            document.querySelectorAll('.port-cell').forEach(cell => {
+                cell.className = 'port-cell';
+            });
+            
+            document.querySelectorAll('.hint-item').forEach(hint => {
+                hint.classList.remove('found');
+            });
+            
+            document.getElementById('targetStatus').textContent = 'SCANNING';
+            document.getElementById('targetStatus').style.color = 'var(--accent-green)';
+            
+            addLog('Scan initiated. Target acquired.', 'info');
+            
+            // Start timers
+            gameState.timer = setInterval(updateTimer, 1000);
+            gameState.idsTimer = setInterval(triggerIDS, difficulties[gameState.difficulty].idsInterval);
+            
+            updateDisplay();
+        }
+
+        function scanPort() {
+            if (!gameState.isPlaying) {
+                addLog('Press INITIATE SCAN first!', 'error');
+                return;
+            }
+            
+            const input = document.getElementById('portInput');
+            const port = parseInt(input.value);
+            
+            if (!port || port < 1 || port > 1000) {
+                addLog('Invalid port number! Range: 1-1000', 'error');
+                return;
+            }
+            
+            if (gameState.scannedPorts.includes(port)) {
+                addLog(`Port ${port} already scanned!`, 'error');
+                return;
+            }
+            
+            gameState.scannedPorts.push(port);
+            
+            // Visual feedback on grid
+            const cellIndex = Math.min(99, Math.floor(port / 10));
+            const cell = document.getElementById(`cell-${cellIndex}`);
+            cell.classList.add('current-scan');
+            setTimeout(() => cell.classList.remove('current-scan'), 500);
+            
+            // Check if it's a target
+            const target = gameState.targetServices.find(([p]) => parseInt(p) === port);
+            
+            if (target) {
+                // Found a service!
+                const [portNum, service] = target;
+                gameState.found++;
+                gameState.foundServices.push(service);
+                gameState.score += 150;
+                
+                document.getElementById(`hint-${portNum}`).classList.add('found');
+                cell.classList.add('open');
+                
+                addLog(`✓ Port ${port} OPEN - ${service}`, 'success');
+                
+                // Check win condition
+                if (gameState.found === gameState.targetServices.length) {
+                    endGame(true);
+                }
+            } else {
+                // Port closed or not a target
+                cell.classList.add('scanned');
+                gameState.score = Math.max(0, gameState.score - 10);
+                addLog(`✗ Port ${port} closed/filtered`, 'error');
+            }
+            
+            input.value = '';
+            input.focus();
+            updateDisplay();
+        }
+
+        function triggerIDS() {
+            if (!gameState.isPlaying) return;
+            
+            gameState.strikes++;
+            addLog('🚨 IDS ALERT! Scan detected!', 'error');
+            
+            // Visual feedback
+            document.body.style.animation = 'shake 0.5s';
+            setTimeout(() => document.body.style.animation = '', 500);
+            
+            // Lock random port ranges
+            for (let i = 0; i < 5; i++) {
+                const randomCell = Math.floor(Math.random() * 100);
+                const cell = document.getElementById(`cell-${randomCell}`);
+                if (!cell.classList.contains('open')) {
+                    cell.classList.add('locked');
+                }
+            }
+            
+            gameState.score = Math.max(0, gameState.score - 50);
+            updateDisplay();
+            
+            if (gameState.strikes >= 3) {
+                endGame(false);
+            }
+        }
+
+        function updateTimer() {
+            gameState.timeLeft--;
+            
+            const maxTime = difficulties[gameState.difficulty].time;
+            const percentage = (gameState.timeLeft / maxTime) * 100;
+            const bar = document.getElementById('timerBar');
+            
+            bar.style.width = percentage + '%';
+            bar.classList.toggle('warning', percentage < 30);
+            
+            if (gameState.timeLeft <= 0) {
+                endGame(false);
+            }
+            
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('time').textContent = gameState.timeLeft;
+            document.getElementById('found').textContent = `${gameState.found}/${gameState.targetServices.length}`;
+            document.getElementById('strikes').textContent = gameState.strikes;
+        }
+
+        function addLog(message, type) {
+            const log = document.getElementById('scanLog');
+            const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `<span class="log-time">[${time}]</span> <span class="log-${type}">${message}</span>`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function endGame(won) {
+            gameState.isPlaying = false;
+            clearInterval(gameState.timer);
+            clearInterval(gameState.idsTimer);
+            
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('startBtn').textContent = '▶ INITIATE SCAN';
+            document.getElementById('scanBtn').disabled = true;
+            document.getElementById('portInput').disabled = true;
+            
+            // Unlock difficulty
+            document.querySelectorAll('.diff-btn').forEach(btn => {
+                btn.disabled = false;
+            });
+            
+            document.getElementById('targetStatus').textContent = won ? 'COMPROMISED' : 'DETECTED';
+            document.getElementById('targetStatus').style.color = won ? 'var(--accent-green)' : 'var(--accent-red)';
+            
+            // Calculate stats
+            const accuracy = Math.round((gameState.found / gameState.scannedPorts.length) * 100) || 0;
+            const timeBonus = gameState.timeLeft * 20;
+            const finalScore = gameState.score + timeBonus;
+            
+            // Update modal
+            document.getElementById('endTitle').textContent = won ? '✓ MISSION SUCCESS' : '✗ MISSION FAILED';
+            document.getElementById('endTitle').style.color = won ? 'var(--accent-green)' : 'var(--accent-red)';
+            document.getElementById('finalFound').textContent = `${gameState.found}/${gameState.targetServices.length}`;
+            document.getElementById('finalScanned').textContent = gameState.scannedPorts.length;
+            document.getElementById('finalAccuracy').textContent = `${accuracy}%`;
+            document.getElementById('finalTimeBonus').textContent = timeBonus;
+            document.getElementById('finalScore').textContent = finalScore;
+            
+            // Save high score
+            const highScore = parseInt(localStorage.getItem('portrush_high') || '0');
+            if (finalScore > highScore) {
+                localStorage.setItem('portrush_high', finalScore);
+                localStorage.setItem('portrush_diff', gameState.difficulty);
+            }
+            
+            document.getElementById('gameOverModal').classList.add('active');
+        }
+
+        function resetGame() {
+            gameState.isPlaying = false;
+            clearInterval(gameState.timer);
+            clearInterval(gameState.idsTimer);
+            
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('startBtn').textContent = '▶ INITIATE SCAN';
+            document.getElementById('scanBtn').disabled = true;
+            document.getElementById('portInput').disabled = true;
+            document.getElementById('portInput').value = '';
+            
+            // Unlock difficulty
+            document.querySelectorAll('.diff-btn').forEach(btn => {
+                btn.disabled = false;
+            });
+            
+            document.getElementById('targetStatus').textContent = 'STANDBY';
+            document.getElementById('targetStatus').style.color = '';
+            document.getElementById('timerBar').style.width = '100%';
+            document.getElementById('timerBar').classList.remove('warning');
+            
+            document.querySelectorAll('.port-cell').forEach(cell => {
+                cell.className = 'port-cell';
+            });
+            
+            document.querySelectorAll('.hint-item').forEach(hint => {
+                hint.classList.remove('found');
+            });
+            
+            document.getElementById('scanLog').innerHTML = `
+                <div class="log-entry">
+                    <span class="log-time">[00:00:00]</span>
+                    <span class="log-info">Scanner ready. Enter port number to begin.</span>
+                </div>
+            `;
+            
+            updateDisplay();
+        }
+
+        function closeModal() {
+            document.getElementById('gameOverModal').classList.remove('active');
+            resetGame();
+        }
+
+        // Initialize
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>

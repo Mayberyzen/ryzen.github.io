@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arsenal | Chetan Mahapatra</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        .projects-page { padding: 100px 2rem 4rem; }
+        .page-header { text-align: center; margin-bottom: 4rem; }
+        .page-header h1 { font-family: var(--font-display); font-size: 4rem; margin-bottom: 1rem; }
+        .arsenal-grid { display: grid; gap: 3rem; max-width: 1200px; margin: 0 auto; }
+        
+        .project-showcase {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+        }
+        
+        .project-showcase:nth-child(even) { direction: rtl; }
+        .project-showcase:nth-child(even) > * { direction: ltr; }
+        
+        .project-visual {
+            background: var(--bg-tertiary);
+            padding: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .project-visual::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(255,0,64,0.1) 0%, transparent 70%);
+        }
+        
+        .project-icon {
+            font-size: 6rem;
+            z-index: 1;
+            filter: drop-shadow(0 0 30px rgba(255,0,64,0.5));
+        }
+        
+        .project-info { padding: 3rem; }
+        .project-header { margin-bottom: 1.5rem; }
+        .project-tag {
+            display: inline-block;
+            background: rgba(255,0,64,0.1);
+            color: var(--accent-red);
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+        .project-info h2 { font-size: 2.5rem; margin-bottom: 1rem; font-family: var(--font-display); }
+        .project-desc { color: var(--text-secondary); margin-bottom: 1.5rem; line-height: 1.8; }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        .feature-item::before {
+            content: '▸';
+            color: var(--accent-red);
+            font-weight: bold;
+        }
+        
+        .tech-row {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+        
+        .tech-pill {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            color: var(--accent-cyan);
+        }
+        
+        .project-links {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .project-links a {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        
+        .btn-github {
+            background: var(--text-primary);
+            color: var(--bg-primary);
+        }
+        
+        .btn-demo {
+            background: transparent;
+            border: 1px solid var(--accent-red);
+            color: var(--accent-red);
+        }
+        
+        .btn-demo:hover {
+            background: var(--accent-red);
+            color: var(--bg-primary);
+        }
+
+        @media (max-width: 768px) {
+            .project-showcase { grid-template-columns: 1fr; }
+            .project-showcase:nth-child(even) { direction: ltr; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrixCanvas" class="matrix-bg"></canvas>
+    <div class="scanlines"></div>
+    
+    <nav class="cyber-nav">
+        <div class="nav-container">
+            <a href="/ryzen/index.html" class="logo">[RYZEN]</a>
+            <div class="nav-links">
+                <a href="about.html">ABOUT</a>
+                <a href="projects.html" class="active">PROJECTS</a>
+                <a href="writeups/index.html">WRITEUPS</a>
+                <a href="tools.html">TOOLS</a>
+                <a href="games.html">GAMES</a>
+                <a href="contact.html">CONTACT</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="projects-page">
+        <div class="page-header">
+            <h1>ARSENAL</h1>
+            <p class="subtitle">Offensive security tools built for real-world operations</p>
+        </div>
+
+        <div class="arsenal-grid">
+            <!-- Z3nHawk -->
+            <article class="project-showcase" id="zenhawk">
+                <div class="project-visual">
+                    <div class="project-icon">🦅</div>
+                </div>
+                <div class="project-info">
+                    <div class="project-header">
+                        <span class="project-tag">FLAGSHIP</span>
+                        <h2>Z3nHawk</h2>
+                    </div>
+                    <p class="project-desc">
+                        Automated reconnaissance and penetration testing framework designed for red team operations. 
+                        Integrates OSINT, cloud security assessment, and automated vulnerability scanning into a unified pipeline.
+                    </p>
+                    <div class="feature-grid">
+                        <div class="feature-item">Subdomain Enumeration</div>
+                        <div class="feature-item">Cloud Config Audit</div>
+                        <div class="feature-item">OSINT Aggregation</div>
+                        <div class="feature-item">Auto-Report Gen</div>
+                    </div>
+                    <div class="tech-row">
+                        <span class="tech-pill">Python</span>
+                        <span class="tech-pill">Asyncio</span>
+                        <span class="tech-pill">OSINT</span>
+                        <span class="tech-pill">AWS/GCP</span>
+                        <span class="tech-pill">SQLite</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/Mayberyzen/Z3NHAWK" class="btn-github" target="_blank">
+                            <span>⌘</span> GitHub
+                        </a>
+                        <a href="tools.html#zenhawk-demo" class="btn-demo">
+                            <span>▶</span> Live Demo
+                        </a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Ph1sherman -->
+            <article class="project-showcase" id="ph1sherman">
+                <div class="project-visual">
+                    <div class="project-icon">🎣</div>
+                </div>
+                <div class="project-info">
+                    <div class="project-header">
+                        <span class="project-tag" style="background: rgba(0,240,255,0.1); color: var(--accent-cyan);">SECURITY</span>
+                        <h2>Ph1sherman</h2>
+                    </div>
+                    <p class="project-desc">
+                        Advanced phishing detection and email security platform. Analyzes email headers, 
+                        content, and attachments to identify sophisticated social engineering attempts and malware delivery.
+                    </p>
+                    <div class="feature-grid">
+                        <div class="feature-item">Header Analysis</div>
+                        <div class="feature-item">Attachment Scan</div>
+                        <div class="feature-item">ML-based Detection</div>
+                        <div class="feature-item">Real-time Alerts</div>
+                    </div>
+                    <div class="tech-row">
+                        <span class="tech-pill">JavaScript</span>
+                        <span class="tech-pill">Node.js</span>
+                        <span class="tech-pill">TensorFlow.js</span>
+                        <span class="tech-pill">VirusTotal API</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/Mayberyzen" class="btn-github" target="_blank">
+                            <span>⌘</span> GitHub
+                        </a>
+                        <a href="tools.html#phish-demo" class="btn-demo">
+                            <span>▶</span> Try Demo
+                        </a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- SecOps -->
+            <article class="project-showcase" id="secops">
+                <div class="project-visual">
+                    <div class="project-icon">🖥️</div>
+                </div>
+                <div class="project-info">
+                    <div class="project-header">
+                        <span class="project-tag" style="background: rgba(184,41,221,0.1); color: var(--accent-purple);">BLUE TEAM</span>
+                        <h2>SecOps</h2>
+                    </div>
+                    <p class="project-desc">
+                        Desktop SOC utility providing real-time network visibility, process monitoring, and threat detection. 
+                        Built for security analysts who need immediate situational awareness.
+                    </p>
+                    <div class="feature-grid">
+                        <div class="feature-item">Real-time Net Monitor</div>
+                        <div class="feature-item">Process Anomaly Detect</div>
+                        <div class="feature-item">Log Aggregation</div>
+                        <div class="feature-item">IOC Matching</div>
+                    </div>
+                    <div class="tech-row">
+                        <span class="tech-pill">Python</span>
+                        <span class="tech-pill">PyQt6</span>
+                        <span class="tech-pill">Scapy</span>
+                        <span class="tech-pill">Elasticsearch</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/Mayberyzen/SecOps" class="btn-github" target="_blank">
+                            <span>⌘</span> GitHub
+                        </a>
+                        <a href="https://github.com/Mayberyzen/SecOps" class="btn-demo" style="border-color: var(--accent-purple); color: var(--accent-purple);">
+                            <span>▼</span> Download
+                        </a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Convctl -->
+            <article class="project-showcase" id="convctl">
+                <div class="project-visual">
+                    <div class="project-icon">📂</div>
+                </div>
+                <div class="project-info">
+                    <div class="project-header">
+                        <span class="project-tag" style="background: rgba(255,102,0,0.1); color: var(--accent-orange);">UTILITY</span>
+                        <h2>Convctl</h2>
+                    </div>
+                    <p class="project-desc">
+                        Interactive CLI tool for file conversion and PDF operations. Streamlines document processing 
+                        for security reports, evidence collection, and data extraction workflows.
+                    </p>
+                    <div class="feature-grid">
+                        <div class="feature-item">Multi-format Convert</div>
+                        <div class="feature-item">PDF Metadata Strip</div>
+                        <div class="feature-item">Batch Processing</div>
+                        <div class="feature-item">Encryption Support</div>
+                    </div>
+                    <div class="tech-row">
+                        <span class="tech-pill">Python</span>
+                        <span class="tech-pill">Click</span>
+                        <span class="tech-pill">PyPDF2</span>
+                        <span class="tech-pill">Pandoc</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/Mayberyzen/convctl" class="btn-github" target="_blank">
+                            <span>⌘</span> GitHub
+                        </a>
+                        <a href="https://github.com/Mayberyzen/convctl" class="btn-demo" style="border-color: var(--accent-orange); color: var(--accent-orange);">
+                            <span>$</span> pip install
+                        </a>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <footer class="cyber-footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>© 2024 Chetan Mahapatra | Offensive Security Practitioner</p>
+                <span class="footer-status">SYSTEM SECURE</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/matrix.js"></script>
+</body>
+</html>

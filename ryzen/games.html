@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Red Team Arcade | Chetan Mahapatra</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/games.css">
+</head>
+<body>
+    <canvas id="matrixCanvas" class="matrix-bg"></canvas>
+    <div class="scanlines"></div>
+    
+    <nav class="cyber-nav">
+        <div class="nav-container">
+            <a href="/ryzen/about.html" class="logo">[RYZEN]</a>
+            <div class="nav-links">
+                <a href="about.html">ABOUT</a>
+                <a href="projects.html">PROJECTS</a>
+                <a href="writeups/index.html">WRITEUPS</a>
+                <a href="tools.html">TOOLS</a>
+                <a href="games.html" class="active">GAMES</a>
+                <a href="contact.html">CONTACT</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="games-page">
+        <div class="container">
+            <header class="page-header">
+                <h1>RED TEAM ARCADE</h1>
+                <p class="subtitle">Practice your skills. Beat the high scores. Level up.</p>
+            </header>
+
+            <div class="games-grid">
+                <!-- Hacker Type -->
+                <div class="game-card">
+                    <div class="game-preview hackertype-preview">
+                        <div class="preview-animation"></div>
+                    </div>
+                    <div class="game-info">
+                        <h3>HackerType</h3>
+                        <p>Hollywood-style hacking simulator. Type code at lightspeed to "hack" the mainframe before time runs out.</p>
+                        <div class="game-stats">
+                            <span>High Score: <b id="hackertype-high">0</b></span>
+                        </div>
+                        <a href="games/hackertype.html" class="play-btn">LAUNCH</a>
+                    </div>
+                </div>
+
+                <!-- Port Scanner Game -->
+                <div class="game-card">
+                    <div class="game-preview portscan-preview">
+                        <div class="scan-animation"></div>
+                    </div>
+                    <div class="game-info">
+                        <h3>PortRush</h3>
+                        <p>Fast-paced port scanning challenge. Identify open ports and services before the IDS catches you.</p>
+                        <div class="game-stats">
+                            <span>Best Time: <b id="portrush-high">--</b></span>
+                        </div>
+                        <a href="games/portrush.html" class="play-btn">LAUNCH</a>
+                    </div>
+                </div>
+
+                <!-- Crypto Challenge -->
+                <div class="game-card">
+                    <div class="game-preview tycoon-preview">
+                        <div class="server-tycoon"></div>
+                    </div>
+                    <div class="game-info">
+                        <h3>server-tycoon</h3>
+                        <p>have some fun here xd.</p>
+                        <div class="game-stats">
+                            <span>Level: <b id="at level">1</b></span>
+                        </div>
+                        <a href="games/server-tycoon.html" class="play-btn">LAUNCH</a>
+                    </div>
+                </div>
+
+                <!-- Terminal Snake -->
+                <div class="game-card">
+                    <div class="game-preview snake-preview">
+                        <div class="snake-animation">~</div>
+                    </div>
+                    <div class="game-info">
+                        <h3>Terminal Snake</h3>
+                        <p>Classic snake with a cybersecurity twist. Collect data packets, avoid firewalls.</p>
+                        <div class="game-stats">
+                            <span>High Score: <b id="snake-high">0</b></span>
+                        </div>
+                        <a href="games/terminal-snake.html" class="play-btn">LAUNCH</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/matrix.js"></script>
+</body>
+</html>

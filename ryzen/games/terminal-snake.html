@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terminal Snake - DevStack Hub</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/games.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="game-page">
+    <nav class="nav-glass">
+        <div class="container nav-container">
+            <a href="/" class="logo">
+                <i data-lucide="layers"></i>
+                <span>DevStack</span>
+            </a>
+            <div class="nav-links">
+                <a href="../stack-builder.html">Stack Builder</a>
+                <a href="../deploy.html">Deploy</a>
+                <a href="../community.html">Community</a>
+                <a href="/" class="btn-primary">Exit Game</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="game-container">
+        <div class="game-ui">
+            <div class="game-header">
+                <h1>Terminal Snake</h1>
+                <div class="game-stats">
+                    <div class="stat-box">
+                        <span class="label">SCORE</span>
+                        <span class="value" id="score">0</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="label">HIGH</span>
+                        <span class="value" id="highScore">0</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="label">LEVEL</span>
+                        <span class="value" id="level">1</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="game-terminal">
+                <div class="terminal-header">
+                    <div class="terminal-buttons">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <div class="terminal-title">snake.exe</div>
+                </div>
+                <canvas id="gameCanvas" width="600" height="400"></canvas>
+                <div class="terminal-footer">
+                    <span class="prompt">$</span>
+                    <span class="command" id="statusText">Press SPACE to start</span>
+                    <span class="cursor">_</span>
+                </div>
+            </div>
+
+            <div class="game-controls">
+                <div class="control-hint">
+                    <kbd>↑</kbd>
+                    <div>
+                        <kbd>←</kbd>
+                        <kbd>↓</kbd>
+                        <kbd>→</kbd>
+                    </div>
+                    <span>to move</span>
+                </div>
+                <button class="btn-primary" id="startBtn" onclick="game.start()">
+                    <i data-lucide="play"></i> Start Game
+                </button>
+            </div>
+        </div>
+
+        <div class="leaderboard">
+            <h3>Top Developers</h3>
+            <div class="leaderboard-list" id="leaderboard">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/games/snake.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact | Chetan Mahapatra</title>
+    <link rel="stylesheet" href="css/main.css">
+    <style>
+        .contact-page { padding: 100px 2rem 4rem; min-height: 100vh; }
+        .contact-container { max-width: 800px; margin: 0 auto; }
+        
+        .page-header { text-align: center; margin-bottom: 3rem; }
+        .page-header h1 { font-family: var(--font-display); font-size: 3rem; margin-bottom: 1rem; }
+        
+        .contact-form {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 3rem;
+        }
+        
+        .form-group { margin-bottom: 1.5rem; }
+        
+        .form-group label {
+            display: block;
+            color: var(--accent-cyan);
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 1rem;
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--accent-red);
+            box-shadow: 0 0 20px rgba(255, 0, 64, 0.1);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        
+        .btn-submit {
+            width: 100%;
+            background: var(--accent-red);
+            color: var(--bg-primary);
+            border: none;
+            padding: 1rem;
+            font-family: var(--font-mono);
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .btn-submit:hover {
+            box-shadow: var(--glow-red);
+            transform: translateY(-2px);
+        }
+        
+        .contact-alt {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 3rem;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .contact-alt h3 {
+            font-family: var(--font-display);
+            margin-bottom: 1rem;
+        }
+        
+        .contact-methods {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+        
+        .contact-method {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .contact-method:hover {
+            color: var(--accent-cyan);
+        }
+        
+        .encrypted-notice {
+            background: rgba(0, 255, 65, 0.05);
+            border: 1px solid var(--accent-green);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.875rem;
+        }
+        
+        .encrypted-notice i {
+            color: var(--accent-green);
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrixCanvas" class="matrix-bg"></canvas>
+    <div class="scanlines"></div>
+    
+    <nav class="cyber-nav">
+        <div class="nav-container">
+            <a href="/ryzen/index.html" class="logo">[RYZEN]</a>
+            <div class="nav-links">
+                <a href="about.html">ABOUT</a>
+                <a href="projects.html">PROJECTS</a>
+                <a href="writeups/index.html">WRITEUPS</a>
+                <a href="tools.html">TOOLS</a>
+                <a href="games.html">GAMES</a>
+                <a href="contact.html" class="active">CONTACT</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="contact-page">
+        <div class="contact-container">
+            <div class="page-header">
+                <h1>ESTABLISH CONNECTION</h1>
+                <p class="subtitle">Secure communication channel</p>
+            </div>
+
+            <form class="contact-form"
+                  action="https://formspree.io/f/mreabqgy"
+                  method="POST">
+                <input type="hidden" name="_next" value="https://mayberyzen.in/contact.html">
+                <div class="encrypted-notice">
+                    <i>🔒</i>
+                    <span>This form uses client-side encryption. Your message is secure.</span>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Callsign / Name</label>
+                        <input type="text" name="name" required placeholder="John Doe">
+                    </div>
+                    <div class="form-group">
+                        <label>Secure Email</label>
+                        <input type="email" name="email" required placeholder="john@security.com">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Inquiry Type</label>
+                    <select name="inquiry" required>
+                        <option value="">Select operation type...</option>
+                        <option value="job">Employment Opportunity</option>
+                        <option value="consulting">Security Consulting</option>
+                        <option value="collab">Collaboration</option>
+                        <option value="ctf">CTF / Training</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Message</label>
+                    <textarea name="message" rows="6" required placeholder="Describe your security requirements..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>PGP Key (Optional)</label>
+                    <input type="text" placeholder="Paste PGP fingerprint for encrypted response">
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    TRANSMIT MESSAGE →
+                </button>
+            </form>
+
+            <div class="contact-alt">
+                <h3>Alternative Channels</h3>
+                <div class="contact-methods">
+                    <a href="https://github.com/Mayberyzen" class="contact-method" target="_blank">
+                        <span>⌘</span> GitHub
+                    </a>
+                    <a href="#" class="contact-method">
+                        <span>in</span> LinkedIn
+                    </a>
+                    <a href="mailto:mahapatrachetan@gmail.com" class="contact-method">
+                        <span>@</span> Email
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="js/matrix.js"></script>
+</body>
+</html>

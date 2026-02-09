@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About | Chetan Mahapatra</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Orbitron:wght@400;700;900&display=swap');
+        
+        :root {
+            --neon-pink: #ff2a6d;
+            --neon-cyan: #05d9e8;
+            --neon-purple: #b829dd;
+            --neon-green: #00ff41;
+            --neon-orange: #ff6600;
+            --dark-bg: #0a0a0a;
+            --darker-bg: #050505;
+            --card-bg: #111111;
+            --card-bg-hover: #1a1a1a;
+            --border-color: #2a2a2a;
+            --text-primary: #e0e0e0;
+            --text-secondary: #888888;
+            --font-display: 'Orbitron', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-mono);
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            position: relative;
+            line-height: 1.6;
+        }
+
+        /* Matrix Background */
+        #matrixCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.12;
+        }
+
+        /* Scanlines Overlay */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                rgba(255,255,255,0),
+                rgba(255,255,255,0) 50%,
+                rgba(0,0,0,0.1) 50%,
+                rgba(0,0,0,0.1)
+            );
+            background-size: 100% 4px;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        /* Navigation */
+        .cyber-nav {
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.5rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #fff;
+            text-decoration: none;
+            letter-spacing: 2px;
+            text-shadow: 0 0 20px rgba(255, 42, 109, 0.5);
+        }
+
+        .logo::before {
+            content: '[';
+            color: var(--neon-pink);
+            margin-right: 5px;
+        }
+
+        .logo::after {
+            content: ']';
+            color: var(--neon-pink);
+            margin-left: 5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            position: relative;
+            font-weight: 600;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px rgba(5, 217, 232, 0.5);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--neon-cyan);
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 100%;
+        }
+
+        /* Main Layout */
+        .about-page {
+            padding: 4rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .about-container {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 4rem;
+            align-items: start;
+        }
+
+        /* Profile Card - Terminal Style */
+        .profile-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            position: sticky;
+            top: 120px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .terminal-header {
+            background: var(--darker-bg);
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .terminal-dot.red { 
+            background: var(--neon-pink); 
+            box-shadow: 0 0 10px var(--neon-pink);
+        }
+        .terminal-dot.yellow { 
+            background: var(--neon-orange); 
+            box-shadow: 0 0 10px var(--neon-orange);
+        }
+        .terminal-dot.green { 
+            background: var(--neon-green); 
+            box-shadow: 0 0 10px var(--neon-green);
+        }
+
+        .terminal-title {
+            margin-left: auto;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+        }
+
+        .profile-content {
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 160px;
+            height: 160px;
+            background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            box-shadow: 0 0 60px rgba(255, 42, 109, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-avatar::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent,
+                rgba(255, 255, 255, 0.1),
+                transparent
+            );
+            transform: rotate(45deg);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        .profile-name {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            margin-bottom: 0.5rem;
+            color: #fff;
+        }
+
+        .profile-role {
+            display: inline-block;
+            background: rgba(255, 42, 109, 0.15);
+            color: var(--neon-pink);
+            padding: 0.4rem 1rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border: 1px solid var(--neon-pink);
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0 20px rgba(255, 42, 109, 0.2);
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-box {
+            background: var(--darker-bg);
+            padding: 1.2rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .stat-box:hover {
+            border-color: var(--neon-cyan);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(5, 217, 232, 0.1);
+        }
+
+        .stat-value {
+            display: block;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px rgba(5, 217, 232, 0.3);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .social-btn {
+            width: 45px;
+            height: 45px;
+            background: var(--darker-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .social-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .social-btn:hover::before {
+            left: 100%;
+        }
+
+        .social-btn:hover {
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(5, 217, 232, 0.2);
+        }
+
+        /* About Content */
+        .about-content {
+            padding-top: 1rem;
+        }
+
+        .section-header {
+            margin-bottom: 2rem;
+        }
+
+        .section-tag {
+            display: inline-block;
+            color: var(--neon-green);
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+            font-family: var(--font-mono);
+        }
+
+        .section-tag::before {
+            content: '>';
+            margin-right: 0.5rem;
+            color: var(--neon-pink);
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #fff 0%, var(--neon-cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::after {
+            content: '_';
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .bio-text {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+
+        .bio-text .highlight {
+            color: var(--neon-cyan);
+            font-weight: 600;
+        }
+
+        .bio-text .highlight-pink {
+            color: var(--neon-pink);
+            font-weight: 600;
+        }
+
+        /* Competencies Grid */
+        .competencies-section {
+            margin: 4rem 0;
+        }
+
+        .competencies-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .competency-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1.2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .competency-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: var(--neon-pink);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .competency-card:hover {
+            background: var(--card-bg-hover);
+            border-color: var(--neon-pink);
+            transform: translateX(5px);
+            box-shadow: 0 10px 30px rgba(255, 42, 109, 0.1);
+        }
+
+        .competency-card:hover::before {
+            opacity: 1;
+        }
+
+        .competency-icon {
+            width: 55px;
+            height: 55px;
+            background: rgba(255, 42, 109, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            border: 1px solid rgba(255, 42, 109, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .competency-card:hover .competency-icon {
+            background: rgba(255, 42, 109, 0.2);
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255, 42, 109, 0.3);
+        }
+
+        .competency-card:nth-child(2) .competency-icon {
+            background: rgba(5, 217, 232, 0.1);
+            border-color: rgba(5, 217, 232, 0.3);
+        }
+
+        .competency-card:nth-child(2):hover .competency-icon {
+            background: rgba(5, 217, 232, 0.2);
+            box-shadow: 0 0 20px rgba(5, 217, 232, 0.3);
+        }
+
+        .competency-card:nth-child(3) .competency-icon {
+            background: rgba(184, 41, 221, 0.1);
+            border-color: rgba(184, 41, 221, 0.3);
+        }
+
+        .competency-card:nth-child(3):hover .competency-icon {
+            background: rgba(184, 41, 221, 0.2);
+            box-shadow: 0 0 20px rgba(184, 41, 221, 0.3);
+        }
+
+        .competency-card:nth-child(4) .competency-icon {
+            background: rgba(255, 102, 0, 0.1);
+            border-color: rgba(255, 102, 0, 0.3);
+        }
+
+        .competency-card:nth-child(4):hover .competency-icon {
+            background: rgba(255, 102, 0, 0.2);
+            box-shadow: 0 0 20px rgba(255, 102, 0, 0.3);
+        }
+
+        .competency-info h3 {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+            color: #fff;
+        }
+
+        .competency-info p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Certifications */
+        .certifications-section {
+            margin-top: 4rem;
+        }
+
+        .certifications-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .cert-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .cert-card:hover {
+            border-color: var(--neon-cyan);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(5, 217, 232, 0.15);
+        }
+
+        .cert-icon {
+            font-size: 1.3rem;
+        }
+
+        .cert-text {
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .cert-status {
+            font-size: 0.75rem;
+            color: var(--neon-green);
+            margin-left: 0.5rem;
+        }
+
+        /* Terminal Decoration */
+        .terminal-decoration {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-size: 0.8rem;
+            color: var(--border-color);
+            font-family: var(--font-mono);
+            z-index: 10;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .about-container {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+
+            .profile-card {
+                position: static;
+                max-width: 400px;
+                margin: 0 auto;
+            }
+
+            .competencies-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-title {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .certifications-grid {
+                flex-direction: column;
+            }
+
+            .cert-card {
+                width: 100%;
+            }
+        }
+
+        /* Loading Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .profile-card,
+        .competency-card,
+        .cert-card {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        .competency-card:nth-child(1) { animation-delay: 0.1s; }
+        .competency-card:nth-child(2) { animation-delay: 0.2s; }
+        .competency-card:nth-child(3) { animation-delay: 0.3s; }
+        .competency-card:nth-child(4) { animation-delay: 0.4s; }
+        .cert-card:nth-child(1) { animation-delay: 0.5s; }
+        .cert-card:nth-child(2) { animation-delay: 0.6s; }
+        .cert-card:nth-child(3) { animation-delay: 0.7s; }
+        .cert-card:nth-child(4) { animation-delay: 0.8s; }
+    </style>
+</head>
+<body>
+    <canvas id="matrixCanvas"></canvas>
+    <div class="scanlines"></div>
+
+    <nav class="cyber-nav">
+        <div class="nav-container">
+            <a href="/ryzen/index.html" class="logo">RYZEN</a>
+            <div class="nav-links">
+                <a href="about.html" class="active">ABOUT</a>
+                <a href="projects.html">PROJECTS</a>
+                <a href="writeups/index.html">WRITEUPS</a>
+                <a href="tools.html">TOOLS</a>
+                <a href="games.html">GAMES</a>
+                <a href="contact.html">CONTACT</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="about-page">
+        <div class="about-container">
+            <aside class="profile-card">
+                <div class="terminal-header">
+                    <div class="terminal-dot red"></div>
+                    <div class="terminal-dot yellow"></div>
+                    <div class="terminal-dot green"></div>
+                    <span class="terminal-title">user@ryzen:~</span>
+                </div>
+                <div class="profile-content">
+                    <div class="profile-avatar">👤</div>
+                    <h2 class="profile-name">Chetan Mahapatra</h2>
+                    <span class="profile-role">Red Team Operator</span>
+                    
+                    <div class="profile-stats">
+                        <div class="stat-box">
+                            <span class="stat-value">4</span>
+                            <span class="stat-label">Tools</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-value">MCA</span>
+                            <span class="stat-label">Degree</span>
+                        </div>
+                    </div>
+
+                    <div class="social-links">
+                        <a href="https://github.com/Mayberyzen" target="_blank" class="social-btn" title="GitHub">⌘</a>
+                        <a href="#" class="social-btn" title="LinkedIn">in</a>
+                        <a href="#" class="social-btn" title="Twitter">𝕏</a>
+                        <a href="contact.html" class="social-btn" title="Email">@</a>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <div class="about-content">
+                <div class="section-header">
+                    <span class="section-tag">whoami</span>
+                    <h1 class="section-title">Identity</h1>
+                </div>
+
+                <p class="bio-text">
+                    I'm <span class="highlight">Chetan Mahapatra</span>, a cybersecurity professional specializing in 
+                    <span class="highlight-pink">offensive security</span> and 
+                    <span class="highlight-pink">red team operations</span>. Currently pursuing my Master's in 
+                    Cybersecurity & Digital Forensics, I focus on simulating advanced persistent threats to help 
+                    organizations strengthen their defenses.
+                </p>
+
+                <p class="bio-text">
+                    My journey into cybersecurity started with a fascination for understanding how systems break. 
+                    Today, I build tools like <span class="highlight">Z3nHawk</span> and 
+                    <span class="highlight">Ph1sherman</span> to automate offensive security workflows, while 
+                    actively participating in bug bounty programs and CTF competitions.
+                </p>
+
+                <!-- Core Competencies -->
+                <section class="competencies-section">
+                    <div class="section-header">
+                        <span class="section-tag">skills --list</span>
+                        <h2 class="section-title" style="font-size: 2rem;">Core Competencies</h2>
+                    </div>
+
+                    <div class="competencies-grid">
+                        <div class="competency-card">
+                            <div class="competency-icon">🎯</div>
+                            <div class="competency-info">
+                                <h3>Red Team Operations</h3>
+                                <p>Adversary simulation, stealth tactics, social engineering</p>
+                            </div>
+                        </div>
+
+                        <div class="competency-card">
+                            <div class="competency-icon">🏴</div>
+                            <div class="competency-info">
+                                <h3>Active Directory</h3>
+                                <p>Domain enumeration, lateral movement, privilege escalation</p>
+                            </div>
+                        </div>
+
+                        <div class="competency-card">
+                            <div class="competency-icon">🌐</div>
+                            <div class="competency-info">
+                                <h3>Web Application Security</h3>
+                                <p>OWASP Top 10, custom exploit development, API testing</p>
+                            </div>
+                        </div>
+
+                        <div class="competency-card">
+                            <div class="competency-icon">🛠️</div>
+                            <div class="competency-info">
+                                <h3>Tool Development</h3>
+                                <p>Python, Go, automation frameworks, offensive tools</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Certifications -->
+                <section class="certifications-section">
+                    <div class="section-header">
+                        <span class="section-tag">certs --show</span>
+                        <h2 class="section-title" style="font-size: 2rem;">Certifications</h2>
+                    </div>
+
+                    <div class="certifications-grid">
+                        <div class="cert-card">
+                            <span class="cert-icon">📜</span>
+                            <span class="cert-text">eJPT</span>
+                            <span class="cert-status">In Progress</span>
+                        </div>
+                        <div class="cert-card">
+                            <span class="cert-icon">🏆</span>
+                            <span class="cert-text">Red Teamer</span>
+                        </div>
+                        <div class="cert-card">
+                            <span class="cert-icon">🐛</span>
+                            <span class="cert-text">Bug Bounty Hunter</span>
+                        </div>
+                        <div class="cert-card">
+                            <span class="cert-icon">🎓</span>
+                            <span class="cert-text">MCA Cybersecurity</span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <div class="terminal-decoration">root@ryzen:~# whoami > identity.txt</div>
+
+    <script>
+        // Matrix Rain Effect
+        const canvas = document.getElementById('matrixCanvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+        const drops = [];
+
+        for (let i = 0; i < columns; i++) {
+            drops[i] = Math.random() * -100;
+        }
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(10, 10, 10, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#0F0';
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars[Math.floor(Math.random() * chars.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(drawMatrix, 35);
+
+        // Resize handler
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Add hover sound effect simulation (visual feedback)
+        document.querySelectorAll('.competency-card, .cert-card, .social-btn').forEach(el => {
+            el.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateX(5px) scale(1.02)';
+            });
+            el.addEventListener('mouseleave', function() {
+                this.style.transform = '';
+            });
+        });
+    </script>
+</body>
+</html>
