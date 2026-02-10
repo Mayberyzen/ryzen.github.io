@@ -658,9 +658,9 @@
 
     <nav class="cyber-nav">
         <div class="nav-container">
-            <a href="/ryzen/index.html" class="logo">RYZEN</a>
+            <a href="index.html" class="logo">RYZEN</a>
             <div class="nav-links">
-                <a href="about.html" class="active">ABOUT</a>
+                <a href=about.html" class="active">ABOUT</a>
                 <a href="projects.html">PROJECTS</a>
                 <a href="writeups/index.html">WRITEUPS</a>
                 <a href="tools.html">TOOLS</a>
@@ -697,7 +697,7 @@
 
                     <div class="social-links">
                         <a href="https://github.com/Mayberyzen" target="_blank" class="social-btn" title="GitHub">⌘</a>
-                        <a href="#" class="social-btn" title="LinkedIn">in</a>
+                        <a href="https://www.linkedin.com/in/chetanmahapatra/" class="social-btn" title="LinkedIn">in</a>
                         <a href="#" class="social-btn" title="Twitter">𝕏</a>
                         <a href="contact.html" class="social-btn" title="Email">@</a>
                     </div>
@@ -843,9 +843,7 @@
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         });
-
-        // Add hover sound effect simulation (visual feedback)
-        document.querySelectorAll('.competency-card, .cert-card, .social-btn').forEach(el => {
+        document.querySelectorAll('.competency-card, .cert-card, .social-btn').forEach(el => {        
             el.addEventListener('mouseenter', function() {
                 this.style.transform = 'translateX(5px) scale(1.02)';
             });
